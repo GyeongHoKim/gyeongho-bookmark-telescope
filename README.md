@@ -1,5 +1,7 @@
 # GyeongHo Bookmark Telescope
 
+You can install it from [Chrome Web Store](https://chromewebstore.google.com/detail/apapcobjnbpmndcpcedjhngmgocjancj?utm_source=item-share-cb)
+
 ![Demo](assets/demo.gif)
 
 A Chrome extension that provides nvim-telescope like interface for searching(live-grep) and previewing bookmarks. Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac) to open the telescope overlay.

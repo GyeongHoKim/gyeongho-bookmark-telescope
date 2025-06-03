@@ -1,0 +1,166 @@
+/* Telescope overlay styles inspired by nvim-telescope */
+
+.bookmark-telescope-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 2147483647;
+  display: none;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.bookmark-telescope-overlay.active {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.telescope-container {
+  width: 90%;
+  max-width: 1200px;
+  height: 80%;
+  background-color: #1e1e1e;
+  border: 1px solid #3c3c3c;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.telescope-header {
+  background-color: #2d2d2d;
+  padding: 12px 16px;
+  border-bottom: 1px solid #3c3c3c;
+}
+
+.telescope-search {
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 16px;
+  outline: none;
+  padding: 4px 0;
+}
+
+.telescope-search::placeholder {
+  color: #666666;
+}
+
+.telescope-body {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+}
+
+.telescope-results {
+  width: 50%;
+  background-color: #1e1e1e;
+  border-right: 1px solid #3c3c3c;
+  overflow-y: auto;
+}
+
+.telescope-preview {
+  width: 50%;
+  background-color: #252525;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.telescope-item {
+  padding: 8px 16px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: background-color 0.1s;
+  display: flex;
+  flex-direction: column;
+}
+
+.telescope-item:hover {
+  background-color: #2d2d2d;
+}
+
+.telescope-item.selected {
+  background-color: #264f78;
+  border-left-color: #0e639c;
+}
+
+.telescope-item-title {
+  color: #ffffff;
+  font-weight: 500;
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.telescope-item-url {
+  color: #569cd6;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.telescope-preview-header {
+  color: #569cd6;
+  font-size: 12px;
+  margin-bottom: 12px;
+  word-break: break-all;
+}
+
+.telescope-preview-content {
+  color: #d4d4d4;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.telescope-loading {
+  color: #569cd6;
+  text-align: center;
+  padding: 20px;
+}
+
+.telescope-error {
+  color: #f44747;
+  font-size: 12px;
+  padding: 16px;
+}
+
+.telescope-help {
+  position: absolute;
+  bottom: 12px;
+  right: 16px;
+  color: #666666;
+  font-size: 11px;
+}
+
+/* Custom scrollbar */
+.telescope-results::-webkit-scrollbar,
+.telescope-preview::-webkit-scrollbar {
+  width: 6px;
+}
+
+.telescope-results::-webkit-scrollbar-track,
+.telescope-preview::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+.telescope-results::-webkit-scrollbar-thumb,
+.telescope-preview::-webkit-scrollbar-thumb {
+  background: #3c3c3c;
+  border-radius: 3px;
+}
+
+.telescope-results::-webkit-scrollbar-thumb:hover,
+.telescope-preview::-webkit-scrollbar-thumb:hover {
+  background: #4c4c4c;
+}
