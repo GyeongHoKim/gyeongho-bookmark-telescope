@@ -199,6 +199,10 @@ const BookmarkTelescope: React.FC = () => {
 
   if (!isVisible) return null;
 
+  // 결과 개수
+  const totalCount = filteredBookmarks.length;
+  const selectedCount = totalCount > 0 ? selectedIndex + 1 : 0;
+
   return (
     <div 
       className="bookmark-telescope-overlay active"
@@ -206,47 +210,69 @@ const BookmarkTelescope: React.FC = () => {
       onClick={handleOverlayClick}
     >
       <div className="telescope-container">
-        <div className="telescope-header">
-          <input
-            ref={searchInputRef}
-            type="text"
-            className="telescope-search"
-            placeholder="Search bookmarks (regex supported)..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        <div className="telescope-body">
-          <div className="telescope-results">
-            {filteredBookmarks.length === 0 ? (
-              <div className="telescope-loading">No bookmarks found</div>
-            ) : (
-              filteredBookmarks.map((bookmark, index) => (
-                <div
-                  key={bookmark.id}
-                  className={`telescope-item ${index === selectedIndex ? 'selected' : ''}`}
-                  onClick={() => handleItemClick(index)}
-                  onDoubleClick={handleItemDoubleClick}
-                >
-                  <div className="telescope-item-title">{bookmark.title}</div>
-                  <div className="telescope-item-url">{bookmark.url}</div>
-                </div>
-              ))
-            )}
-          </div>
-          <div className="telescope-preview">
-            <div className="telescope-preview-header">{previewHeader}</div>
-            <div className="telescope-preview-content">
-              {isLoading ? (
-                <div className="telescope-loading">Loading preview...</div>
+        {/* 상단: Results와 Grep Preview 나란히 */}
+        <div className="telescope-main-sections">
+          {/* Results 섹션 */}
+          <div className="telescope-section telescope-results-section">
+            <div className="telescope-section-header">
+              <span className="telescope-section-label">Results</span>
+              <span className="telescope-section-counter">{totalCount > 0 ? `${selectedCount} / ${totalCount}` : '0 / 0'}</span>
+            </div>
+            
+            <div className="telescope-results">
+              {filteredBookmarks.length === 0 ? (
+                <div className="telescope-loading">No bookmarks found</div>
               ) : (
-                previewContent
+                filteredBookmarks.map((bookmark, index) => (
+                  <div
+                    key={bookmark.id}
+                    className={`telescope-item ${index === selectedIndex ? 'selected' : ''}`}
+                    onClick={() => handleItemClick(index)}
+                    onDoubleClick={handleItemDoubleClick}
+                  >
+                    <span className="telescope-item-path">
+                      {bookmark.url}
+                    </span>
+                    <span className="telescope-item-title">
+                      {bookmark.title}
+                    </span>
+                  </div>
+                ))
               )}
             </div>
           </div>
+          
+          {/* Grep Preview 섹션 */}
+          <div className="telescope-section telescope-preview-section">
+            <div className="telescope-section-header">
+              <span className="telescope-section-label">Grep Preview</span>
+            </div>
+            
+            <div className="telescope-preview">
+              {previewHeader && (
+                <div className="telescope-preview-url">{previewHeader}</div>
+              )}
+              <pre className="telescope-preview-content">
+                {isLoading ? 'Loading preview...' : previewContent}
+              </pre>
+            </div>
+          </div>
         </div>
-        <div className="telescope-help">
-          Ctrl+Shift+P toggle | Up/Down navigate | Enter open | Esc close
+        
+        {/* Live Grep 섹션 */}
+        <div className="telescope-search-section">
+          <span className="telescope-search-label">Live Grep</span>
+          <div className="telescope-search-content">
+            <input
+              ref={searchInputRef}
+              type="text"
+              className="telescope-search"
+              placeholder=""
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <span className="telescope-search-counter">{totalCount > 0 ? `${selectedCount} / ${totalCount}` : '0 / 0'}</span>
+          </div>
         </div>
       </div>
     </div>
