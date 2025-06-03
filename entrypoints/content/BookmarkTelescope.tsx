@@ -19,6 +19,7 @@ const BookmarkTelescope: React.FC = () => {
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Load bookmarks
   const loadBookmarks = useCallback(async () => {
@@ -56,7 +57,6 @@ const BookmarkTelescope: React.FC = () => {
       );
       setFilteredBookmarks(filtered);
     }
-    setSelectedIndex(0);
   }, [bookmarks]);
 
   // Update preview for selected bookmark
@@ -113,28 +113,27 @@ const BookmarkTelescope: React.FC = () => {
         break;
       case 'Enter':
         e.preventDefault();
-        openSelectedBookmark();
+        openSelectedBookmark(selectedIndex);
         break;
       case 'Escape':
         e.preventDefault();
         hide();
         break;
     }
-  }, [isVisible, filteredBookmarks.length]);
+  }, [isVisible, filteredBookmarks.length, selectedIndex]);
 
   // Open selected bookmark
-  const openSelectedBookmark = useCallback(() => {
-    if (filteredBookmarks.length === 0 || selectedIndex >= filteredBookmarks.length) {
+  const openSelectedBookmark = (index: number) => {
+    if (filteredBookmarks.length === 0 || index >= filteredBookmarks.length) {
       return;
     }
-
-    const bookmark = filteredBookmarks[selectedIndex];
+    const bookmark = filteredBookmarks[index];
     browser.runtime.sendMessage({
       action: 'open-bookmark',
       url: bookmark.url
     });
     hide();
-  }, [filteredBookmarks, selectedIndex]);
+  };
 
   // Show telescope
   const show = useCallback(async () => {
@@ -166,8 +165,8 @@ const BookmarkTelescope: React.FC = () => {
 
   // Handle item double click
   const handleItemDoubleClick = useCallback(() => {
-    openSelectedBookmark();
-  }, [openSelectedBookmark]);
+    openSelectedBookmark(selectedIndex);
+  }, [selectedIndex]);
 
   // Effects
   useEffect(() => {
@@ -197,6 +196,12 @@ const BookmarkTelescope: React.FC = () => {
     };
   }, [isVisible, handleKeyDown, show, hide]);
 
+  useEffect(() => {
+    if (itemRefs.current[selectedIndex]) {
+      itemRefs.current[selectedIndex]?.scrollIntoView({ block: 'nearest' });
+    }
+  }, [selectedIndex, filteredBookmarks]);
+
   if (!isVisible) return null;
 
   // 결과 개수
@@ -218,7 +223,6 @@ const BookmarkTelescope: React.FC = () => {
               <span className="telescope-section-label">Results</span>
               <span className="telescope-section-counter">{totalCount > 0 ? `${selectedCount} / ${totalCount}` : '0 / 0'}</span>
             </div>
-            
             <div className="telescope-results">
               {filteredBookmarks.length === 0 ? (
                 <div className="telescope-loading">No bookmarks found</div>
@@ -226,6 +230,7 @@ const BookmarkTelescope: React.FC = () => {
                 filteredBookmarks.map((bookmark, index) => (
                   <div
                     key={bookmark.id}
+                    ref={el => { itemRefs.current[index] = el; }}
                     className={`telescope-item ${index === selectedIndex ? 'selected' : ''}`}
                     onClick={() => handleItemClick(index)}
                     onDoubleClick={handleItemDoubleClick}
@@ -269,7 +274,10 @@ const BookmarkTelescope: React.FC = () => {
               className="telescope-search"
               placeholder=""
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setSelectedIndex(0);
+              }}
             />
             <span className="telescope-search-counter">{totalCount > 0 ? `${selectedCount} / ${totalCount}` : '0 / 0'}</span>
           </div>
