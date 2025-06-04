@@ -3,6 +3,9 @@ import { defineConfig } from 'wxt';
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   modules: ['@wxt-dev/module-react'],
+  zip: {
+    artifactTemplate: 'bookmark-telescope-{{browser}}.zip'
+  },
   manifest: {
     name: 'Bookmark Telescope',
     description: 'Live grep through bookmarks with nvim-telescope like interface using Ctrl+Shift+P',

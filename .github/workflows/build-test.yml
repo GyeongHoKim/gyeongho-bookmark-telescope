@@ -1,0 +1,23 @@
+name: Build & Zip Test
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  pr-build-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: npm install
+      - name: Build extension
+        run: npm run build
+      - name: Zip extension
+        run: npm run zip
+      - name: Check zip file exists
+        run: test -f .output/bookmark-telescope-chrome.zip 
