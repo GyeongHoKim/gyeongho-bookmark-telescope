@@ -76,6 +76,7 @@ interface BookmarkNode {
   id: string;
   title: string;
   url?: string;
+  parentId?: string;
   children?: BookmarkNode[];
 }
 
@@ -83,6 +84,7 @@ interface Bookmark {
   id: string;
   title: string;
   url: string;
+  parentId?: string;
 }
 
 function extractBookmarks(nodes: BookmarkNode[], bookmarks: Bookmark[] = []): Bookmark[] {

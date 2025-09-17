@@ -209,7 +209,7 @@ const BookmarkTelescope: React.FC = () => {
   const selectedCount = totalCount > 0 ? selectedIndex + 1 : 0;
 
   return (
-    <div 
+    <div
       className="bookmark-telescope-overlay active"
       ref={overlayRef}
       onClick={handleOverlayClick}
@@ -246,13 +246,13 @@ const BookmarkTelescope: React.FC = () => {
               )}
             </div>
           </div>
-          
+
           {/* Grep Preview 섹션 */}
           <div className="telescope-section telescope-preview-section">
             <div className="telescope-section-header">
               <span className="telescope-section-label">Grep Preview</span>
             </div>
-            
+
             <div className="telescope-preview">
               {previewHeader && (
                 <div className="telescope-preview-url">{previewHeader}</div>
@@ -263,7 +263,7 @@ const BookmarkTelescope: React.FC = () => {
             </div>
           </div>
         </div>
-        
+
         {/* Live Grep 섹션 */}
         <div className="telescope-search-section">
           <span className="telescope-search-label">Live Grep</span>
