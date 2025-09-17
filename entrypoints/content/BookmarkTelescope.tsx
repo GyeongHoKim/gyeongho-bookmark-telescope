@@ -59,6 +59,35 @@ const BookmarkTelescope: React.FC = () => {
     }
   }, [bookmarks]);
 
+  // Hide telescope
+  const hide = useCallback(() => {
+    setIsVisible(false);
+    searchInputRef.current?.blur();
+  }, []);
+
+  // Open selected bookmark
+  const openSelectedBookmark = useCallback((index: number) => {
+    if (filteredBookmarks.length === 0 || index >= filteredBookmarks.length) {
+      return;
+    }
+    const bookmark = filteredBookmarks[index];
+    browser.runtime.sendMessage({
+      action: 'open-bookmark',
+      url: bookmark.url
+    });
+    hide();
+  }, [filteredBookmarks, hide]);
+
+  // Show telescope
+  const show = useCallback(async () => {
+    setIsVisible(true);
+    setSearchQuery('');
+    await loadBookmarks();
+    setTimeout(() => {
+      searchInputRef.current?.focus();
+    }, 100);
+  }, [loadBookmarks]);
+
   // Update preview for selected bookmark
   const updatePreview = useCallback(async () => {
     if (filteredBookmarks.length === 0 || selectedIndex >= filteredBookmarks.length) {
@@ -100,14 +129,14 @@ const BookmarkTelescope: React.FC = () => {
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setSelectedIndex((prev) => 
+        setSelectedIndex((prev) =>
           filteredBookmarks.length === 0 ? 0 : (prev + 1) % filteredBookmarks.length
         );
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setSelectedIndex((prev) => 
-          filteredBookmarks.length === 0 ? 0 : 
+        setSelectedIndex((prev) =>
+          filteredBookmarks.length === 0 ? 0 :
           (prev - 1 + filteredBookmarks.length) % filteredBookmarks.length
         );
         break;
@@ -120,36 +149,7 @@ const BookmarkTelescope: React.FC = () => {
         hide();
         break;
     }
-  }, [isVisible, filteredBookmarks.length, selectedIndex]);
-
-  // Open selected bookmark
-  const openSelectedBookmark = (index: number) => {
-    if (filteredBookmarks.length === 0 || index >= filteredBookmarks.length) {
-      return;
-    }
-    const bookmark = filteredBookmarks[index];
-    browser.runtime.sendMessage({
-      action: 'open-bookmark',
-      url: bookmark.url
-    });
-    hide();
-  };
-
-  // Show telescope
-  const show = useCallback(async () => {
-    setIsVisible(true);
-    setSearchQuery('');
-    await loadBookmarks();
-    setTimeout(() => {
-      searchInputRef.current?.focus();
-    }, 100);
-  }, [loadBookmarks]);
-
-  // Hide telescope
-  const hide = useCallback(() => {
-    setIsVisible(false);
-    searchInputRef.current?.blur();
-  }, []);
+  }, [isVisible, filteredBookmarks.length, selectedIndex, hide, openSelectedBookmark]);
 
   // Handle click outside
   const handleOverlayClick = useCallback((e: React.MouseEvent) => {
@@ -166,7 +166,7 @@ const BookmarkTelescope: React.FC = () => {
   // Handle item double click
   const handleItemDoubleClick = useCallback(() => {
     openSelectedBookmark(selectedIndex);
-  }, [selectedIndex]);
+  }, [selectedIndex, openSelectedBookmark]);
 
   // Effects
   useEffect(() => {
