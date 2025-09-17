@@ -16,9 +16,22 @@ A Chrome extension that provides nvim-telescope like interface for searching(liv
 
 ## TODO
 
-- [ ] Meaningful Summary in the preview pane(Raw HTML now)
-- [ ] Add a shortcut to add a new bookmark
-- [ ] Edit existing bookmark
+### Core AI Features
+- [ ] Semantic Search ([#3](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/3))
+- [ ] AI-Powered Summary ([#4](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/4))
+- [ ] Auto-Categorization ([#5](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/5))
+
+### Advanced Features
+- [ ] Visual Bookmark Creation ([#6](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/6))
+- [ ] Voice Management ([#7](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/7))
+- [ ] Multilingual Support ([#8](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/8))
+- [ ] Writing Assistant ([#9](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/9))
+- [ ] Hybrid AI Sync ([#10](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/10))
+- [ ] Analytics Dashboard ([#11](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/11))
+
+### Basic Features
+- [ ] Add bookmark keyboard shortcut ([#12](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/12))
+- [ ] Editing existing bookmark ([#13](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/13))
 
 ## Installation
 
