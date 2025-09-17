@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 📚 Documentation
+    url: https://github.com/gyeongho/gyeongho-bookmark-telescope#readme
+    about: Check out the project documentation
+  - name: 💬 Discussions
+    url: https://github.com/gyeongho/gyeongho-bookmark-telescope/discussions
+    about: Share general questions or ideas
