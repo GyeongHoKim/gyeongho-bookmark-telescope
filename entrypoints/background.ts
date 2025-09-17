@@ -72,7 +72,20 @@ export default defineBackground(() => {
 });
 
 // Extract bookmarks from tree structure
-function extractBookmarks(nodes: any[], bookmarks: any[] = []): any[] {
+interface BookmarkNode {
+  id: string;
+  title: string;
+  url?: string;
+  children?: BookmarkNode[];
+}
+
+interface Bookmark {
+  id: string;
+  title: string;
+  url: string;
+}
+
+function extractBookmarks(nodes: BookmarkNode[], bookmarks: Bookmark[] = []): Bookmark[] {
   for (const node of nodes) {
     if (node.url) {
       bookmarks.push({
