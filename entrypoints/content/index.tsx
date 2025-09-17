@@ -1,5 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import BookmarkTelescope from './BookmarkTelescope';
+import LeaderPalette from './LeaderPalette';
 import './telescope.css';
 
 export default defineContentScript({
@@ -18,7 +19,10 @@ export default defineContentScript({
 
     // Mount React component
     const root = createRoot(container);
-    root.render(<BookmarkTelescope />);
+    root.render(<>
+      <BookmarkTelescope />
+      <LeaderPalette />
+    </>);
 
     // Listen for messages from background script
     browser.runtime.onMessage.addListener((message) => {
