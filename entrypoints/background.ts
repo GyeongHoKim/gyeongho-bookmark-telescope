@@ -37,6 +37,48 @@ export default defineBackground(() => {
         }
       }
     }
+
+    if (command === 'quick-bookmark') {
+      const [tab] = await browser.tabs.query({
+        active: true,
+        currentWindow: true
+      });
+
+      if (!tab.id) {
+        console.error('No active tab found');
+        return;
+      }
+
+      const payload = {
+        action: 'open-quick-bookmark',
+        title: typeof tab.title === 'string' ? tab.title : '',
+        url: typeof tab.url === 'string' ? tab.url : ''
+      };
+
+      try {
+        await browser.tabs.sendMessage(tab.id, payload);
+      } catch (error) {
+        console.error('Error sending quick-bookmark message:', error);
+        try {
+          await browser.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ['/content-scripts/content.js']
+          });
+
+          setTimeout(async () => {
+            try {
+              if (tab.id) {
+                await browser.tabs.sendMessage(tab.id, payload);
+              }
+            } catch (retryError) {
+              console.error('Still failed after injection (quick):', retryError);
+            }
+          }, 100);
+        } catch (injectionError) {
+          console.error('Failed to inject content script (quick):', injectionError);
+        }
+      }
+    }
   });
 
   // Handle messages from content script
@@ -68,6 +110,29 @@ export default defineBackground(() => {
       browser.tabs.create({ url: message.url });
       sendResponse({ success: true });
     }
+
+    if (message.action === 'get-bookmark-folders') {
+      browser.bookmarks.getTree().then((tree) => {
+        const folders = extractFolders(tree);
+        sendResponse({ folders });
+      }).catch((error) => {
+        sendResponse({ folders: [], error: error.message });
+      });
+      return true;
+    }
+
+    if (message.action === 'create-bookmark') {
+      const title: string = message.title;
+      const url: string = message.url;
+      const parentId: string | undefined = message.parentId;
+
+      browser.bookmarks.create({ title, url, parentId }).then((node) => {
+        sendResponse({ success: true, id: node.id });
+      }).catch((error) => {
+        sendResponse({ success: false, error: error.message });
+      });
+      return true;
+    }
   });
 });
 
@@ -77,12 +142,14 @@ interface BookmarkNode {
   title: string;
   url?: string;
   children?: BookmarkNode[];
+  parentId?: string;
 }
 
 interface Bookmark {
   id: string;
   title: string;
   url: string;
+  parentId: string;
 }
 
 function extractBookmarks(nodes: BookmarkNode[], bookmarks: Bookmark[] = []): Bookmark[] {
@@ -92,7 +159,7 @@ function extractBookmarks(nodes: BookmarkNode[], bookmarks: Bookmark[] = []): Bo
         id: node.id,
         title: node.title,
         url: node.url,
-        parentId: node.parentId
+        parentId: typeof node.parentId === 'string' ? node.parentId : ''
       });
     }
     if (node.children) {
@@ -100,4 +167,29 @@ function extractBookmarks(nodes: BookmarkNode[], bookmarks: Bookmark[] = []): Bo
     }
   }
   return bookmarks;
+}
+
+interface BookmarkFolder {
+  id: string;
+  title: string;
+  path: string;
+}
+
+function extractFolders(nodes: BookmarkNode[], ancestors: string[] = [], folders: BookmarkFolder[] = []): BookmarkFolder[] {
+  for (const node of nodes) {
+    const currentPath = [...ancestors, typeof node.title === 'string' ? node.title : ''].filter(Boolean);
+    if (!node.url) {
+      if (typeof node.title === 'string' && node.title.trim().length > 0) {
+        folders.push({
+          id: node.id,
+          title: node.title,
+          path: currentPath.join(' / ')
+        });
+      }
+      if (node.children) {
+        extractFolders(node.children, currentPath, folders);
+      }
+    }
+  }
+  return folders;
 }

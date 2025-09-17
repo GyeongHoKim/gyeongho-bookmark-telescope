@@ -248,3 +248,128 @@
 .telescope-preview::-webkit-scrollbar-thumb:hover {
   background: #585b70;
 }
+
+/* Quick Bookmark dialog */
+.quick-bookmark-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quick-dialog {
+  width: 560px;
+  max-width: 92vw;
+  background-color: #1e1e2e;
+  border: 2px solid #cdd6f4;
+  border-radius: 10px;
+  padding: 16px;
+  color: #cdd6f4;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.quick-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.quick-row {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.quick-label {
+  color: #cdd6f4;
+  font-size: 13px;
+}
+
+.quick-input {
+  width: 100%;
+  background: #181825;
+  color: #cdd6f4;
+  border: 1px solid #45475a;
+  border-radius: 6px;
+  padding: 8px 10px;
+  outline: none;
+}
+
+.quick-input:focus {
+  border-color: #89b4fa;
+}
+
+.quick-select-list {
+  max-height: 180px;
+  overflow-y: auto;
+  background: #181825;
+  border: 1px solid #45475a;
+  border-radius: 6px;
+  padding: 6px;
+}
+
+.quick-empty {
+  color: #6c7086;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.quick-select-item {
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.quick-select-item:hover {
+  background: #313244;
+}
+
+.quick-select-item.selected {
+  background: #45475a;
+}
+
+.quick-item-title {
+  font-size: 13px;
+  color: #cdd6f4;
+}
+
+.quick-item-path {
+  font-size: 12px;
+  color: #6c7086;
+}
+
+.quick-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.quick-btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #45475a;
+  background: #181825;
+  color: #cdd6f4;
+  cursor: pointer;
+}
+
+.quick-btn.primary {
+  border-color: #89b4fa;
+}
+
+.quick-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.quick-message {
+  margin-top: 10px;
+  color: #89b4fa;
+  font-size: 12px;
+}

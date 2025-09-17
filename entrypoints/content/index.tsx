@@ -1,5 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import BookmarkTelescope from './BookmarkTelescope';
+import QuickBookmarkDialog from './QuickBookmarkDialog';
 import './telescope.css';
 
 export default defineContentScript({
@@ -18,7 +19,12 @@ export default defineContentScript({
 
     // Mount React component
     const root = createRoot(container);
-    root.render(<BookmarkTelescope />);
+    root.render(
+      <>
+        <BookmarkTelescope />
+        <QuickBookmarkDialog />
+      </>
+    );
 
     // Listen for messages from background script
     browser.runtime.onMessage.addListener((message) => {

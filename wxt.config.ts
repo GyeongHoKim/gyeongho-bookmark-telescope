@@ -18,6 +18,13 @@ export default defineConfig({
           mac: 'Command+Shift+P'
         },
         description: 'Open bookmark telescope'
+      },
+      'quick-bookmark': {
+        suggested_key: {
+          default: 'Alt+Shift+B',
+          mac: 'Option+Shift+B'
+        },
+        description: 'Quick add current page to bookmarks'
       }
     },
     content_scripts: [
