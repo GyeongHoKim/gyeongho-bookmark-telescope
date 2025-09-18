@@ -80,12 +80,25 @@ export default defineBackground(() => {
     }
 
     if (message.action === 'add-bookmark') {
+      // Validate required fields
+      if (!message.url) {
+        console.error('URL is required for bookmark creation');
+        sendResponse({ success: false, error: 'URL is required for bookmark creation' });
+        return true;
+      }
+
+      if (!message.title) {
+        console.error('Title is required for bookmark creation');
+        sendResponse({ success: false, error: 'Title is required for bookmark creation' });
+        return true;
+      }
+
       // Add bookmark to the specified parent or bookmarks bar
       const parentId = message.parentId || '1'; // Default to bookmarks bar
       browser.bookmarks.create({
         parentId,
         title: message.title,
-        url: message.url || window.location?.href
+        url: message.url
       }).then((newBookmark) => {
         console.log('Bookmark created:', newBookmark);
         sendResponse({ success: true, bookmark: newBookmark });
