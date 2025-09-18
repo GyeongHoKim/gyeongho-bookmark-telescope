@@ -3,12 +3,7 @@
   "description": "Live grep through bookmarks with nvim-telescope like interface using Ctrl+L",
   "version": "1.0",
   "manifest_version": 3,
-  "permissions": [
-    "bookmarks", 
-    "tabs",
-    "activeTab",
-    "scripting"
-  ],
+  "permissions": ["bookmarks", "tabs", "activeTab", "scripting"],
   "background": {
     "service_worker": "service-worker.js"
   },
@@ -20,12 +15,12 @@
     }
   ],
   "commands": {
-    "open-telescope": {
+    "open-leader-palette": {
       "suggested_key": {
-        "default": "Ctrl+Shift+P",
-        "mac": "Command+Shift+P"
+        "default": "Ctrl+Shift+L",
+        "mac": "Command+Shift+L"
       },
-      "description": "Open bookmark telescope"
+      "description": "Open leader palette"
     }
   },
   "icons": {

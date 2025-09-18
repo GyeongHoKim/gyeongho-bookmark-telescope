@@ -1,6 +1,6 @@
 {
   "name": "bookmark-telescope",
-  "description": "Live grep through bookmarks with nvim-telescope like interface using Ctrl+Shift+P",
+  "description": "Live grep through bookmarks with nvim-telescope like interface using leader key",
   "private": false,
   "author": "GyeongHoKim",
   "license": "MIT",

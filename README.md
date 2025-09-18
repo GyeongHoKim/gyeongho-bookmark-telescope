@@ -4,11 +4,11 @@ You can install it from [Chrome Web Store](https://chromewebstore.google.com/det
 
 ![Demo](assets/demo.gif)
 
-A Chrome extension that provides nvim-telescope like interface for searching(live-grep) and previewing bookmarks. Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac) to open the telescope overlay.
+A Chrome extension that provides nvim-telescope like interface for searching(live-grep) and previewing bookmarks. Press `Ctrl+Shift+L` (or `Cmd+Shift+L` on Mac) to open the leader palette, then press `g` to search bookmarks.
 
 ## Features
 
-- **Quick Access**: Press `Ctrl+Shift+P` from any webpage to open the telescope
+- **Quick Access**: Press `Ctrl+Shift+L` then `g` from any webpage to open the telescope
 - **Live Search**: Search through bookmarks with regex support
 - **Preview Pane**: Shows raw HTML content of selected bookmarks
 - **Keyboard Navigation**: Navigate with arrow keys, open with Enter, close with Escape
@@ -42,7 +42,7 @@ A Chrome extension that provides nvim-telescope like interface for searching(liv
 
 ## Usage
 
-1. **Open Telescope**: Press `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (Mac) on any webpage
+1. **Open Telescope**: Press `Ctrl+Shift+L` (Windows/Linux) or `Cmd+Shift+L` (Mac) to open leader palette, then press `g`
 2. **Search**: Type in the search box to filter bookmarks by title or URL
 3. **Navigate**: Use ↑↓ arrow keys to navigate through results
 4. **Preview**: Selected bookmark's page content will be shown in the preview pane
@@ -51,7 +51,8 @@ A Chrome extension that provides nvim-telescope like interface for searching(liv
 
 ## Keyboard Shortcuts
 
-- `Ctrl+Shift+P` / `Cmd+Shift+P`: Open/close telescope
+- `Ctrl+Shift+L` / `Cmd+Shift+L`: Open leader palette
+- `g`: Search bookmarks (after opening leader palette)
 - `↑` / `↓`: Navigate through results
 - `Enter`: Open selected bookmark
 - `Esc`: Close telescope

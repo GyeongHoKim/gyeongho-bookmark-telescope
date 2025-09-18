@@ -1,38 +1,4 @@
-import { useEffect, useState } from 'react';
-
-interface Command {
-  name?: string;
-  description?: string;
-  shortcut?: string;
-}
-
 function App() {
-  const [currentShortcut, setCurrentShortcut] = useState<string>('Ctrl+Shift+P');
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Get current shortcut from Chrome
-    if (browser?.commands?.getAll) {
-      browser.commands.getAll().then((commands: Command[]) => {
-        const telescopeCommand = commands.find(cmd => cmd.name === 'open-telescope');
-        if (telescopeCommand?.shortcut) {
-          setCurrentShortcut(telescopeCommand.shortcut);
-        }
-        setIsLoading(false);
-      }).catch(() => {
-        setIsLoading(false);
-      });
-    } else {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const openShortcutSettings = () => {
-    browser.tabs.create({
-      url: 'chrome://extensions/shortcuts'
-    });
-  };
-
   return (
     <div className="popup-container">
       <div className="header">
@@ -41,25 +7,17 @@ function App() {
       </div>
 
       <div className="shortcut-section">
-        <label className="shortcut-label">Current Shortcut:</label>
+        <label className="shortcut-label">How to use:</label>
         <div className="shortcut-display">
-          {isLoading ? 'Loading...' : currentShortcut}
+          Press <kbd>Ctrl+Shift+L</kbd> (or <kbd>Cmd+Shift+L</kbd> on Mac) then{' '}
+          <kbd>g</kbd>
         </div>
-      </div>
-
-      <div className="buttons">
-        <button 
-          className="secondary-button"
-          onClick={openShortcutSettings}
-          title="Open Chrome shortcuts settings"
-        >
-          Customize Shortcut
-        </button>
       </div>
 
       <div className="help-text">
         <p>
-          customize the keyboard shortcut in Chrome settings.
+          Use the leader key <kbd>Ctrl+Shift+L</kbd> to open the command
+          palette, then press <kbd>g</kbd> to search bookmarks.
         </p>
       </div>
     </div>

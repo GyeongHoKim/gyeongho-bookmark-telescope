@@ -8,16 +8,16 @@ export default defineConfig({
   },
   manifest: {
     name: 'Bookmark Telescope',
-    description: 'Live grep through bookmarks with nvim-telescope like interface using Ctrl+Shift+P',
+    description: 'Live grep through bookmarks with nvim-telescope like interface using leader key',
     version: '1.1.0',
     permissions: ['bookmarks', 'tabs', 'activeTab', 'scripting'],
     commands: {
-      'open-telescope': {
+      'open-leader-palette': {
         suggested_key: {
-          default: 'Ctrl+Shift+P',
-          mac: 'Command+Shift+P'
+          default: 'Ctrl+Shift+L',
+          mac: 'Command+Shift+L'
         },
-        description: 'Open bookmark telescope'
+        description: 'Open leader palette'
       }
     },
     content_scripts: [
