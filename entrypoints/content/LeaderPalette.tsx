@@ -1,32 +1,22 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
-interface LeaderItem {
-  id: string;
-  label: string;
-  description: string;
-  hotkeys: string[];
-}
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { LEADER_ACTIONS, LEADER_ITEMS } from './leaderItems';
 
 const LeaderPalette: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [highlightIndex, setHighlightIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const items: LeaderItem[] = useMemo(() => [
-    {
-      id: 'live-grep',
-      label: 'Live Grep',
-      description: 'Search bookmarks',
-      hotkeys: ['g']
-    },
-  ], []);
+  const items = LEADER_ITEMS;
 
   const isEditableElement = useCallback((el: EventTarget | null) => {
     if (!(el instanceof Element)) return false;
     const tagName = el.tagName.toLowerCase();
-    const editableByTag = tagName === 'input' || tagName === 'textarea' || tagName === 'select';
+    const editableByTag =
+      tagName === 'input' || tagName === 'textarea' || tagName === 'select';
     const contentEditable = el.getAttribute('contenteditable');
-    return editableByTag || contentEditable === '' || contentEditable === 'true';
+    return (
+      editableByTag || contentEditable === '' || contentEditable === 'true'
+    );
   }, []);
 
   const close = useCallback(() => {
@@ -38,73 +28,90 @@ const LeaderPalette: React.FC = () => {
     setIsOpen(true);
   }, []);
 
-  const triggerAction = useCallback((itemId: string) => {
-    if (itemId === 'live-grep') {
-      const event = new CustomEvent('telescope-toggle');
-      window.dispatchEvent(event);
-    }
-    close();
-  }, [close]);
-
-  const onGlobalKeyDown = useCallback((e: KeyboardEvent) => {
-    // Do not trigger inside inputs/editors
-    if (isEditableElement(e.target)) return;
-
-    // Leader key: Ctrl+;
-    if (!isOpen && e.key === ';' && e.ctrlKey) {
-      e.preventDefault();
-      open();
-      return;
-    }
-
-    if (!isOpen) return;
-
-    // While palette is open
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      close();
-      return;
-    }
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setHighlightIndex((prev) => (prev + 1) % items.length);
-      return;
-    }
-
-    if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setHighlightIndex((prev) => (prev - 1 + items.length) % items.length);
-      return;
-    }
-
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const item = items[highlightIndex];
-      if (item) {
-        triggerAction(item.id);
+  const triggerAction = useCallback(
+    (itemId: string) => {
+      const action = LEADER_ACTIONS[itemId as keyof typeof LEADER_ACTIONS];
+      if (action) {
+        action();
       }
-      return;
-    }
+      close();
+    },
+    [close]
+  );
 
-    // Quick select by hotkey
-    const lowerKey = e.key.length === 1 ? e.key.toLowerCase() : '';
-    if (lowerKey) {
-      const idx = items.findIndex((it) => it.hotkeys.includes(lowerKey));
-      if (idx >= 0) {
+  const onGlobalKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      // Do not trigger inside inputs/editors
+      if (isEditableElement(e.target)) return;
+
+      // Leader key: Ctrl+; (Windows/Linux) or Cmd+; (Mac)
+      if (!isOpen && e.key === ';' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
-        triggerAction(items[idx].id);
+        open();
+        return;
       }
-    }
-  }, [isOpen, items, highlightIndex, isEditableElement, open, close, triggerAction]);
 
-  const onDocumentClick = useCallback((e: MouseEvent) => {
-    if (!isOpen) return;
-    if (!(e.target instanceof Node)) return;
-    if (containerRef.current && !containerRef.current.contains(e.target)) {
-      close();
-    }
-  }, [isOpen, close]);
+      if (!isOpen) return;
+
+      // While palette is open
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        close();
+        return;
+      }
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setHighlightIndex((prev) => (prev + 1) % items.length);
+        return;
+      }
+
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setHighlightIndex((prev) => (prev - 1 + items.length) % items.length);
+        return;
+      }
+
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const item = items[highlightIndex];
+        if (item) {
+          triggerAction(item.id);
+        }
+        return;
+      }
+
+      // Quick select by hotkey
+      const lowerKey = e.key.length === 1 ? e.key.toLowerCase() : '';
+      if (lowerKey) {
+        const idx = items.findIndex((it) => it.hotkeys.includes(lowerKey));
+        if (idx >= 0) {
+          e.preventDefault();
+          triggerAction(items[idx].id);
+        }
+      }
+    },
+    [
+      isOpen,
+      items,
+      highlightIndex,
+      isEditableElement,
+      open,
+      close,
+      triggerAction,
+    ]
+  );
+
+  const onDocumentClick = useCallback(
+    (e: MouseEvent) => {
+      if (!isOpen) return;
+      if (!(e.target instanceof Node)) return;
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        close();
+      }
+    },
+    [isOpen, close]
+  );
 
   useEffect(() => {
     document.addEventListener('keydown', onGlobalKeyDown, true);
@@ -133,7 +140,9 @@ const LeaderPalette: React.FC = () => {
             <span className="leader-palette-item-key">{item.hotkeys[0]}</span>
             <span className="leader-palette-item-body">
               <span className="leader-palette-item-label">{item.label}</span>
-              <span className="leader-palette-item-desc">{item.description}</span>
+              <span className="leader-palette-item-desc">
+                {item.description}
+              </span>
             </span>
           </button>
         ))}
@@ -144,4 +153,3 @@ const LeaderPalette: React.FC = () => {
 };
 
 export default LeaderPalette;
-

@@ -24,12 +24,5 @@ export default defineContentScript({
       <LeaderPalette />
     </>);
 
-    // Listen for messages from background script
-    browser.runtime.onMessage.addListener((message) => {
-      if (message.action === 'toggle-telescope') {
-        const event = new CustomEvent('telescope-toggle');
-        window.dispatchEvent(event);
-      }
-    });
   },
 });
