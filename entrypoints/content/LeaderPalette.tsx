@@ -44,12 +44,8 @@ const LeaderPalette: React.FC = () => {
       // Do not trigger inside inputs/editors
       if (isEditableElement(e.target)) return;
 
-      // Leader key: Ctrl+; (Windows/Linux) or Cmd+; (Mac)
-      if (!isOpen && e.key === ';' && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault();
-        open();
-        return;
-      }
+      // Leader key is now handled by Chrome commands API (Ctrl+Shift+T / Cmd+Shift+T)
+      // No need to handle keyboard events here
 
       if (!isOpen) return;
 
@@ -91,15 +87,7 @@ const LeaderPalette: React.FC = () => {
         }
       }
     },
-    [
-      isOpen,
-      items,
-      highlightIndex,
-      isEditableElement,
-      open,
-      close,
-      triggerAction,
-    ]
+    [isOpen, items, highlightIndex, isEditableElement, close, triggerAction]
   );
 
   const onDocumentClick = useCallback(
@@ -116,11 +104,23 @@ const LeaderPalette: React.FC = () => {
   useEffect(() => {
     document.addEventListener('keydown', onGlobalKeyDown, true);
     document.addEventListener('mousedown', onDocumentClick, true);
+
+    // Listen for custom events from background script
+    const handleOpenLeaderPalette = () => {
+      open();
+    };
+
+    window.addEventListener('open-leader-palette', handleOpenLeaderPalette);
+
     return () => {
       document.removeEventListener('keydown', onGlobalKeyDown, true);
       document.removeEventListener('mousedown', onDocumentClick, true);
+      window.removeEventListener(
+        'open-leader-palette',
+        handleOpenLeaderPalette
+      );
     };
-  }, [onGlobalKeyDown, onDocumentClick]);
+  }, [onGlobalKeyDown, onDocumentClick, open]);
 
   if (!isOpen) return null;
 

@@ -1,40 +1,40 @@
 export default defineBackground(() => {
   // Handle keyboard commands
   browser.commands.onCommand.addListener(async (command) => {
-    if (command === 'open-telescope') {
-      const [tab] = await browser.tabs.query({
-        active: true,
-        currentWindow: true
-      });
+    const [tab] = await browser.tabs.query({
+      active: true,
+      currentWindow: true
+    });
 
-      if (!tab.id) {
-        console.error('No active tab found');
-        return;
+    if (!tab.id) {
+      console.error('No active tab found');
+      return;
+    }
+
+    try {
+      if (command === 'open-leader-palette') {
+        await browser.tabs.sendMessage(tab.id, { action: 'open-leader-palette' });
       }
-
+    } catch (error) {
+      console.error('Error sending message:', error);
       try {
-        await browser.tabs.sendMessage(tab.id, { action: 'toggle-telescope' });
-      } catch (error) {
-        console.error('Error sending message:', error);
-        try {
-          await browser.scripting.executeScript({
-            target: { tabId: tab.id },
-            files: ['/content-scripts/content.js']
-          });
+        await browser.scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ['/content-scripts/content.js']
+        });
 
-          setTimeout(async () => {
-            try {
-              if (tab.id) {
-                await browser.tabs.sendMessage(tab.id, { action: 'toggle-telescope' });
-              }
-            } catch (retryError) {
-              console.error('Still failed after injection:', retryError);
+        setTimeout(async () => {
+          try {
+            if (tab.id && command === 'open-leader-palette') {
+              await browser.tabs.sendMessage(tab.id, { action: 'open-leader-palette' });
             }
-          }, 100);
+          } catch (retryError) {
+            console.error('Still failed after injection:', retryError);
+          }
+        }, 100);
 
-        } catch (injectionError) {
-          console.error('Failed to inject content script:', injectionError);
-        }
+      } catch (injectionError) {
+        console.error('Failed to inject content script:', injectionError);
       }
     }
   });

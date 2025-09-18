@@ -29,7 +29,7 @@ This is a Chrome/Firefox browser extension built with **WXT framework** and **Re
 - `wxt.config.ts` - WXT configuration with React module and manifest settings
 
 **Extension Architecture:**
-- **Background Script**: Listens for `Ctrl+Shift+P` command, fetches bookmarks via Chrome API, handles cross-origin requests for page previews
+- **Background Script**: Fetches bookmarks via Chrome API, handles cross-origin requests for page previews
 - **Content Script**: Injects React telescope UI into any webpage, communicates with background via message passing
 - **React Component**: Implements live search with regex support, keyboard navigation, and HTML preview pane
 
@@ -88,6 +88,11 @@ The extension can be loaded in Chrome developer mode by building and loading the
 - **Fix all ESLint errors and warnings before considering changes complete**
 - Use `npm run lint:fix` for automatic fixes where possible
 - Never ignore or disable ESLint rules without explicit justification
+
+**Keyboard Shortcut Development:**
+- **ALWAYS reference `CHROME_KEYBOARD_SHORTCUT.md` when working with keyboard shortcuts**
+- **Check for conflicts with Chrome's default keyboard shortcuts before implementing new ones**
+- **Verify shortcut compatibility across Windows/Linux and Mac platforms**
 
 ## Development Notes
 

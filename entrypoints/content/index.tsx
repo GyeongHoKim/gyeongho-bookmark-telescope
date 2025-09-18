@@ -19,10 +19,19 @@ export default defineContentScript({
 
     // Mount React component
     const root = createRoot(container);
-    root.render(<>
-      <BookmarkTelescope />
-      <LeaderPalette />
-    </>);
+    root.render(
+      <>
+        <BookmarkTelescope />
+        <LeaderPalette />
+      </>
+    );
 
+    // Listen for messages from background script
+    browser.runtime.onMessage.addListener((message) => {
+      if (message.action === 'open-leader-palette') {
+        const event = new CustomEvent('open-leader-palette');
+        window.dispatchEvent(event);
+      }
+    });
   },
 });
