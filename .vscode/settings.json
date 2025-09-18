@@ -52,11 +52,7 @@
     "**/stats-*.json": true
   },
   "files.exclude": {
-    "**/node_modules": true,
-    "**/.wxt": true,
-    "**/.output": true,
-    "**/stats.html": true,
-    "**/stats-*.json": true
+    "**/node_modules": true
   },
   "wxt.autoReload": true
 }

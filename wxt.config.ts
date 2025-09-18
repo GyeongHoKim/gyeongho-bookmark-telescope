@@ -9,7 +9,7 @@ export default defineConfig({
   manifest: {
     name: 'Bookmark Telescope',
     description: 'Live grep through bookmarks with nvim-telescope like interface using leader key',
-    version: '1.1.0',
+    version: '2.0.0',
     permissions: ['bookmarks', 'tabs', 'activeTab', 'scripting'],
     commands: {
       'open-leader-palette': {
