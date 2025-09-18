@@ -52,6 +52,16 @@ export default defineBackground(() => {
       return true;
     }
 
+    if (message.action === 'get-bookmark-tree') {
+      browser.bookmarks.getTree().then((tree) => {
+        console.log('Background: Raw bookmark tree for manager:', tree);
+        sendResponse({ tree });
+      }).catch((error) => {
+        sendResponse({ tree: [], error: error.message });
+      });
+      return true;
+    }
+
     if (message.action === 'fetch-page-content') {
       fetch(message.url)
         .then((response) => response.text())
@@ -67,6 +77,64 @@ export default defineBackground(() => {
     if (message.action === 'open-bookmark') {
       browser.tabs.create({ url: message.url });
       sendResponse({ success: true });
+    }
+
+    if (message.action === 'add-bookmark') {
+      // Add bookmark to the specified parent or bookmarks bar
+      const parentId = message.parentId || '1'; // Default to bookmarks bar
+      browser.bookmarks.create({
+        parentId,
+        title: message.title,
+        url: message.url || window.location?.href
+      }).then((newBookmark) => {
+        console.log('Bookmark created:', newBookmark);
+        sendResponse({ success: true, bookmark: newBookmark });
+      }).catch((error) => {
+        console.error('Failed to create bookmark:', error);
+        sendResponse({ success: false, error: error.message });
+      });
+      return true;
+    }
+
+    if (message.action === 'create-bookmark-folder') {
+      // Create folder (bookmark without URL)
+      browser.bookmarks.create({
+        parentId: message.parentId || '1',
+        title: message.title
+      }).then((newFolder) => {
+        console.log('Folder created:', newFolder);
+        sendResponse({ success: true, folder: newFolder });
+      }).catch((error) => {
+        console.error('Failed to create folder:', error);
+        sendResponse({ success: false, error: error.message });
+      });
+      return true;
+    }
+
+    if (message.action === 'update-bookmark') {
+      // Update bookmark/folder title
+      browser.bookmarks.update(message.id, {
+        title: message.title
+      }).then((updatedBookmark) => {
+        console.log('Bookmark updated:', updatedBookmark);
+        sendResponse({ success: true, bookmark: updatedBookmark });
+      }).catch((error) => {
+        console.error('Failed to update bookmark:', error);
+        sendResponse({ success: false, error: error.message });
+      });
+      return true;
+    }
+
+    if (message.action === 'delete-bookmark') {
+      // Delete bookmark/folder
+      browser.bookmarks.remove(message.id).then(() => {
+        console.log('Bookmark deleted:', message.id);
+        sendResponse({ success: true });
+      }).catch((error) => {
+        console.error('Failed to delete bookmark:', error);
+        sendResponse({ success: false, error: error.message });
+      });
+      return true;
     }
   });
 });
