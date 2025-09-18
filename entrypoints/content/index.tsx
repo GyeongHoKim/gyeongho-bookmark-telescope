@@ -1,5 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import BookmarkTelescope from './BookmarkTelescope';
+import BookmarkManager from './BookmarkManager';
 import LeaderPalette from './LeaderPalette';
 import './telescope.css';
 
@@ -22,6 +23,7 @@ export default defineContentScript({
     root.render(
       <>
         <BookmarkTelescope />
+        <BookmarkManager />
         <LeaderPalette />
       </>
     );

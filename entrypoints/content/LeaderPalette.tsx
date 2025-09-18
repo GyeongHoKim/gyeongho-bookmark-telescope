@@ -56,13 +56,13 @@ const LeaderPalette: React.FC = () => {
         return;
       }
 
-      if (e.key === 'ArrowDown') {
+      if (e.key === 'ArrowDown' || e.key === 'j') {
         e.preventDefault();
         setHighlightIndex((prev) => (prev + 1) % items.length);
         return;
       }
 
-      if (e.key === 'ArrowUp') {
+      if (e.key === 'ArrowUp' || e.key === 'k') {
         e.preventDefault();
         setHighlightIndex((prev) => (prev - 1 + items.length) % items.length);
         return;
@@ -147,7 +147,7 @@ const LeaderPalette: React.FC = () => {
           </button>
         ))}
       </div>
-      <div className="leader-palette-help">Ctrl+; then press key (e.g., g)</div>
+      <div className="leader-palette-help">[j/k: ↑↓] [Enter: select] [ESC: close]</div>
     </div>
   );
 };
