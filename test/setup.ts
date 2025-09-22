@@ -1,15 +1,10 @@
 import '@testing-library/jest-dom';
+import { beforeEach, vi } from 'vitest';
 import { fakeBrowser } from 'wxt/testing';
-import { beforeEach } from 'vitest';
+
+vi.mock('webextension-polyfill');
 
 // Reset fake browser state before each test
 beforeEach(() => {
   fakeBrowser.reset();
 });
-
-// Global test setup
-declare global {
-  var browser: typeof fakeBrowser;
-}
-
-global.browser = fakeBrowser;
