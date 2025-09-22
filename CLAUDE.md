@@ -83,9 +83,9 @@ The extension can be loaded in Chrome developer mode by building and loading the
 - Consistent code formatting and style
 
 **IMPORTANT - Code Modification Requirements:**
-- **ALL code changes MUST pass ESLint validation**
-- **ALWAYS run `npm run lint` after making any code modifications**
-- **Fix all ESLint errors and warnings before considering changes complete**
+- **ALL code changes MUST pass ESLint validation and TypeScript compilation**
+- **ALWAYS run `npm run lint` and `npm run compile` after making any code modifications**
+- **Fix all ESLint errors/warnings and TypeScript errors before considering changes complete**
 - Use `npm run lint:fix` for automatic fixes where possible
 - Never ignore or disable ESLint rules without explicit justification
 

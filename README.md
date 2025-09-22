@@ -30,8 +30,8 @@ A Chrome extension that provides nvim-telescope like interface for searching(liv
 - [ ] Analytics Dashboard ([#11](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/11))
 
 ### Basic Features
-- [ ] Add bookmark keyboard shortcut ([#12](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/12))
-- [ ] Editing existing bookmark ([#13](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/13))
+- [x] Add bookmark keyboard shortcut ([#12](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/12))
+- [x] Editing existing bookmark ([#13](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/13))
 
 ## Installation
 
