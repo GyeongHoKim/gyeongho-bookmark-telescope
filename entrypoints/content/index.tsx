@@ -1,8 +1,8 @@
 import { createRoot } from 'react-dom/client';
-import BookmarkTelescope from './BookmarkTelescope';
-import BookmarkManager from './BookmarkManager';
-import LeaderPalette from './LeaderPalette';
+import LeaderPalette from './leader-palette/components/LeaderPalette';
+import BookmarkManager from './manager/components/BookmarkManager';
 import './telescope.css';
+import BookmarkTelescope from './telescope/BookmarkTelescope';
 
 export default defineContentScript({
   matches: ['<all_urls>'],
@@ -12,6 +12,13 @@ export default defineContentScript({
       return;
     }
     window.bookmarkTelescopeLoaded = true;
+
+    // Add summarization origin trial token to the header
+    const otMeta = document.createElement('meta');
+    otMeta.httpEquiv = 'origin-trial';
+    otMeta.content =
+      'AxnlIOHOvSHjVcKzN7x+KBFtx6ajqwWfcMBoZl/LiDUn35BPxhdETUrfYcjvr/2yUCvF+7WqaOEvFQGb7BM/GggAAACHeyJvcmlnaW4iOiJjaHJvbWUtZXh0ZW5zaW9uOi8vYXBhcGNvYmpuYnBtbmRjcGNlZGpobmdtZ29jamFuY2oiLCJmZWF0dXJlIjoiQUlTdW1tYXJpemF0aW9uQVBJIiwiZXhwaXJ5IjoxNzYwNDAwMDAwLCJpc1RoaXJkUGFydHkiOnRydWV9';
+    document.head.appendChild(otMeta);
 
     // Create container for React component
     const container = document.createElement('div');

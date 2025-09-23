@@ -1,12 +1,9 @@
 import { useMachine } from '@xstate/react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import BookmarkList from './telescope/bookmark-list/BookmarkList';
-import LiveGrep from './telescope/live-grep/LiveGrep';
-import {
-  telescopeMachine,
-  type Bookmark,
-} from './telescope/models/telescopeMachine';
-import Preview from './telescope/preview/Preview';
+import BookmarkList from './bookmark-list/BookmarkList';
+import LiveGrep from './live-grep/LiveGrep';
+import { telescopeMachine, type Bookmark } from './models/telescopeMachine';
+import Preview from './preview/Preview';
 
 const BookmarkTelescope: React.FC = () => {
   const [state, send] = useMachine(telescopeMachine);
