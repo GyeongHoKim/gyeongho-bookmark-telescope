@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { LEADER_ACTIONS, LEADER_ITEMS } from './leaderItems';
+import { LEADER_ACTIONS, LEADER_ITEMS } from '../models/leaderItems';
 
 const LeaderPalette: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -147,7 +147,9 @@ const LeaderPalette: React.FC = () => {
           </button>
         ))}
       </div>
-      <div className="leader-palette-help">[j/k: ↑↓] [Enter: select] [ESC: close]</div>
+      <div className="leader-palette-help">
+        [j/k: ↑↓] [Enter: select] [ESC: close]
+      </div>
     </div>
   );
 };

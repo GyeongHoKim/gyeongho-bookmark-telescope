@@ -43,7 +43,6 @@ export default defineBackground(() => {
   browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === 'get-bookmarks') {
       browser.bookmarks.getTree().then((tree) => {
-        console.log('Background: Raw bookmark tree:', tree);
         const bookmarks = extractBookmarks(tree);
         sendResponse({ bookmarks });
       }).catch((error) => {
@@ -54,7 +53,6 @@ export default defineBackground(() => {
 
     if (message.action === 'get-bookmark-tree') {
       browser.bookmarks.getTree().then((tree) => {
-        console.log('Background: Raw bookmark tree for manager:', tree);
         sendResponse({ tree });
       }).catch((error) => {
         sendResponse({ tree: [], error: error.message });
@@ -100,7 +98,6 @@ export default defineBackground(() => {
         title: message.title,
         url: message.url
       }).then((newBookmark) => {
-        console.log('Bookmark created:', newBookmark);
         sendResponse({ success: true, bookmark: newBookmark });
       }).catch((error) => {
         console.error('Failed to create bookmark:', error);
@@ -115,7 +112,6 @@ export default defineBackground(() => {
         parentId: message.parentId || '1',
         title: message.title
       }).then((newFolder) => {
-        console.log('Folder created:', newFolder);
         sendResponse({ success: true, folder: newFolder });
       }).catch((error) => {
         console.error('Failed to create folder:', error);
@@ -129,7 +125,6 @@ export default defineBackground(() => {
       browser.bookmarks.update(message.id, {
         title: message.title
       }).then((updatedBookmark) => {
-        console.log('Bookmark updated:', updatedBookmark);
         sendResponse({ success: true, bookmark: updatedBookmark });
       }).catch((error) => {
         console.error('Failed to update bookmark:', error);
@@ -141,7 +136,6 @@ export default defineBackground(() => {
     if (message.action === 'delete-bookmark') {
       // Delete bookmark/folder
       browser.bookmarks.remove(message.id).then(() => {
-        console.log('Bookmark deleted:', message.id);
         sendResponse({ success: true });
       }).catch((error) => {
         console.error('Failed to delete bookmark:', error);
