@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import type { Bookmark } from '../telescope/telescopeMachine';
+import type { Bookmark } from '../../telescope/models/telescopeMachine';
 
 interface BookmarkListProps {
   bookmarks: Bookmark[];

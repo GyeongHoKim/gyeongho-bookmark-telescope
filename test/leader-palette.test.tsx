@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import { fakeBrowser } from 'wxt/testing';
-import LeaderPalette from '../entrypoints/content/LeaderPalette';
+import LeaderPalette from '../entrypoints/content/leader-palette/components/LeaderPalette';
 
 describe('LeaderPalette', () => {
   beforeEach(() => {
