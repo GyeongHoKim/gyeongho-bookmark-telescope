@@ -1,4 +1,4 @@
-import { createMachine, assign } from 'xstate';
+import { assign, createMachine } from 'xstate';
 
 export interface Bookmark {
   id: string;
@@ -52,7 +52,7 @@ export const telescopeMachine = createMachine({
   initial: 'normal',
   context: {
     activePanel: 'bookmarkList' as Panel,
-    previewTab: 'html' as PreviewTab,
+    previewTab: 'summarize' as PreviewTab,
     selectedBookmarkIndex: 0,
     bookmarks: [] as Bookmark[],
     filteredBookmarks: [] as Bookmark[],

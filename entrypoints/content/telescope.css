@@ -593,3 +593,154 @@
   font-size: 11px;
   border-top: 1px solid #313244;
 }
+
+/* AI Summarization Styles */
+.telescope-ai-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.telescope-status-indicator {
+  font-size: 12px;
+  animation: pulse 2s infinite;
+}
+
+.telescope-status-indicator.ready {
+  color: #a6e3a1;
+  animation: none;
+}
+
+.telescope-status-indicator.unavailable {
+  color: #6c7086;
+  animation: none;
+}
+
+.telescope-status-indicator.error {
+  color: #f38ba8;
+  animation: none;
+}
+
+.telescope-status-indicator.processing {
+  color: #89b4fa;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.telescope-summary-content {
+  color: #cdd6f4;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin-top: 8px;
+}
+
+/* AI Consent Dialog */
+.telescope-ai-consent {
+  text-align: center;
+  padding: 20px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.telescope-consent-title {
+  color: #f9e2af;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.telescope-consent-message {
+  color: #cdd6f4;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.telescope-consent-controls {
+  color: #6c7086;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.telescope-key-hint {
+  color: #89b4fa;
+  font-weight: bold;
+  background-color: #313244;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: inherit;
+}
+
+/* AI Download Progress */
+.telescope-ai-downloading {
+  text-align: center;
+  padding: 20px;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.telescope-download-title {
+  color: #f9e2af;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.telescope-progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #313244;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.telescope-progress-fill {
+  height: 100%;
+  background-color: #89b4fa;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.1) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.1) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 20px 20px;
+  animation: progress-stripes 1s linear infinite;
+}
+
+@keyframes progress-stripes {
+  0% { background-position: 0 0; }
+  100% { background-position: 20px 0; }
+}
+
+.telescope-progress-text {
+  color: #6c7086;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* AI Error Message */
+.telescope-ai-error {
+  color: #f38ba8;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-top: 12px;
+  padding: 12px;
+  background-color: rgba(243, 139, 168, 0.1);
+  border-left: 3px solid #f38ba8;
+  border-radius: 4px;
+}
