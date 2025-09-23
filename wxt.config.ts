@@ -4,12 +4,12 @@ import { defineConfig } from 'wxt';
 export default defineConfig({
   modules: ['@wxt-dev/module-react'],
   zip: {
-    artifactTemplate: 'bookmark-telescope-{{browser}}.zip'
+    artifactTemplate: 'lazy-bookmark-{{browser}}.zip'
   },
   manifest: {
-    name: 'Bookmark Telescope',
-    description: 'Live grep through bookmarks with nvim-telescope like interface using leader key',
-    version: '2.0.0',
+    name: 'LazyBookmark',
+    description: 'Live grep through bookmarks with LazySth like interface using leader key',
+    version: '3.0.0',
     permissions: ['bookmarks', 'tabs', 'activeTab', 'scripting'],
     commands: {
       'open-leader-palette': {
