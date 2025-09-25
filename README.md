@@ -1,4 +1,4 @@
-# GyeongHo Bookmark Telescope
+# LazyBookmark
 
 You can install it from [Chrome Web Store](https://chromewebstore.google.com/detail/apapcobjnbpmndcpcedjhngmgocjancj?utm_source=item-share-cb)
 
@@ -9,12 +9,15 @@ A Chrome extension that provides nvim-telescope like interface for searching(liv
 ## Features
 
 - **Quick Access**: Press `Ctrl+Shift+L` then `g` from any webpage to open the telescope
-- **Live Search**: Search through bookmarks with regex support
-- **Preview Pane**: Shows raw HTML content of selected bookmarks
-- **Keyboard Navigation**: Navigate with arrow keys, open with Enter, close with Escape
-- **nvim-telescope Styling**: Dark theme with familiar telescope-like interface
+- **Live Grep**: Search through bookmarks with regex support
+- **Preview Pane**: Shows summary of bookmarks, or HTML content of selected bookmarks
+- **LazySth Styling**: Dark theme with familiar LazySth-like interface, Keyboard power user friendly
+- **AI features**: Built-in AI powered by Gemini
 
-## TODO
+### Basic Features
+- [x] Add bookmark keyboard shortcut ([#12](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/12))
+- [x] Editing existing bookmark ([#13](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/13))
+- [x] Telescope(Live Grep) bookmarks
 
 ### Core AI Features
 - [ ] Semantic Search ([#3](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/3))
@@ -28,10 +31,6 @@ A Chrome extension that provides nvim-telescope like interface for searching(liv
 - [ ] Writing Assistant ([#9](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/9))
 - [ ] Hybrid AI Sync ([#10](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/10))
 - [ ] Analytics Dashboard ([#11](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/11))
-
-### Basic Features
-- [x] Add bookmark keyboard shortcut ([#12](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/12))
-- [x] Editing existing bookmark ([#13](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/13))
 
 ## Installation
 
@@ -53,32 +52,9 @@ A Chrome extension that provides nvim-telescope like interface for searching(liv
 
 - `Ctrl+Shift+L` / `Cmd+Shift+L`: Open leader palette
 - `g`: Search bookmarks (after opening leader palette)
-- `↑` / `↓`: Navigate through results
+- `j` / `k`: Navigate through results
 - `Enter`: Open selected bookmark
-- `Esc`: Close telescope
-
-## Search Features
-
-- **Text Search**: Simple text matching in bookmark titles and URLs
-- **Regex Search**: Use regular expressions for advanced filtering
-- **Case Insensitive**: All searches are case insensitive
-
-## Technical Details
-
-This extension uses:
-- **Manifest V3** with service worker
-- **Commands API** for keyboard shortcuts
-- **Bookmarks API** for accessing browser bookmarks
-- **Content Scripts** for overlay injection
-- **Cross-origin requests** for page preview fetching
-
-## Files Structure
-
-- `manifest.json`: Extension configuration
-- `service-worker.js`: Background script handling commands and bookmark fetching
-- `content-script.js`: Main telescope interface logic
-- `telescope.css`: Telescope overlay styling
-- `images/`: Extension icons
+- `q`: Close telescope
 
 ## Privacy
 
@@ -117,42 +93,3 @@ This extension:
 ### 4. Check Permissions
 - Extension needs "bookmarks", "tabs", "activeTab" permissions
 - Check if browser is blocking permissions
-
-## Add Debug Logging
-
-Add these console.log statements to see what's happening:
-
-### In service-worker.js:
-```javascript
-chrome.commands.onCommand.addListener(async (command) => {
-  console.log('Command received:', command);
-  if (command === 'open-telescope') {
-    const [tab] = await chrome.tabs.query({
-      active: true,
-      currentWindow: true
-    });
-    console.log('Active tab:', tab);
-    chrome.tabs.sendMessage(tab.id, { action: 'toggle-telescope' });
-    console.log('Message sent to content script');
-  }
-});
-```
-
-### In content-script.js:
-```javascript
-chrome.runtime.onMessage.addListener((message) => {
-  console.log('Content script received message:', message);
-  if (message.action === 'toggle-telescope') {
-    console.log('Toggling telescope');
-    this.toggle();
-  }
-});
-```
-
-## Common Issues
-
-1. **Extension not loaded properly** - Reload extension
-2. **Content script not injected** - Refresh the webpage
-3. **Keyboard shortcut conflict** - Another extension using Ctrl+L
-4. **CSP blocking scripts** - Some sites block content scripts
-5. **Manifest errors** - Check extension details for errors
