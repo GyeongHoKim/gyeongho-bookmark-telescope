@@ -15,29 +15,32 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run lint:fix` - Run ESLint with automatic fixing
 - `npm install` - Install dependencies and run WXT prepare
 
-## Architecture Overview
+## Product Overview
 
-This is a Chrome/Firefox browser extension built with **WXT framework** and **React** that provides a nvim-telescope-like interface for searching bookmarks.
+**LazyBookmark** is a Chrome/Firefox browser extension built with **WXT framework** and **React** that provides an nvim-telescope-like interface for searching, previewing, and managing bookmarks. Available on [Chrome Web Store](https://chromewebstore.google.com/detail/apapcobjnbpmndcpcedjhngmgocjancj).
 
-### Key Components
+### Architecture Overview
 
 **WXT Framework Structure:**
 - `entrypoints/background.ts` - Service worker handling keyboard commands, bookmark API, and content fetching
 - `entrypoints/content/index.tsx` - Content script entry point that mounts React app
+- `entrypoints/content/leader-palette/` - Leader palette implementation for command-driven interface
 - `entrypoints/content/BookmarkTelescope.tsx` - Main React component with telescope UI
 - `entrypoints/popup/` - Extension popup (settings interface)
 - `wxt.config.ts` - WXT configuration with React module and manifest settings
 
 **Extension Architecture:**
-- **Background Script**: Fetches bookmarks via Chrome API, handles cross-origin requests for page previews
+- **Background Script**: Fetches bookmarks via Chrome API, handles cross-origin requests for page previews, manages AI features
 - **Content Script**: Injects React telescope UI into any webpage, communicates with background via message passing
 - **React Component**: Implements live search with regex support, keyboard navigation, and HTML preview pane
+- **Leader Palette**: LazyVim/LazyGit inspired command palette system (Ctrl+Shift+L → g for bookmarks)
 
 **Key Features:**
-- Live search through bookmarks with regex support
-- Keyboard navigation (↑↓ arrows, Enter to open, Esc to close)
-- HTML preview fetching for selected bookmarks
-- nvim-telescope inspired dark theme
+- Leader palette interface inspired by LazyVim/LazyGit
+- Live grep bookmarks with regex support
+- Preview pane showing bookmark summaries or HTML content
+- LazySth-style dark theme with keyboard-centric navigation
+- AI-powered features using Gemini API
 - Cross-browser support (Chrome/Firefox)
 
 **Communication Flow:**
