@@ -1,74 +1,146 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { fakeBrowser } from 'wxt/testing';
 import LeaderPalette from '../entrypoints/content/leader-palette/components/LeaderPalette';
 
-describe('LeaderPalette', () => {
+describe('LeaderPalette Open/Close', () => {
+  const triggerOpenLeaderPalette = () => {
+    act(() => {
+      const event = new CustomEvent('open-leader-palette');
+      window.dispatchEvent(event);
+    });
+  };
+
   beforeEach(() => {
-    // Reset fake browser state before each test
     fakeBrowser.reset();
   });
 
-  it('should display leader palette when open-leader-palette event is dispatched', async () => {
-    // Render the LeaderPalette component
+  it('should not display leader palette initially', () => {
+    // given & when
     render(<LeaderPalette />);
 
-    // Initially, the palette should not be visible
+    // then
     expect(screen.queryByTestId('leader-palette')).not.toBeInTheDocument();
     expect(document.querySelector('.leader-palette')).toBeNull();
+  });
 
-    // Dispatch the open-leader-palette event wrapped in act
-    await act(async () => {
+  it('should display leader palette when open-leader-palette event is dispatched', async () => {
+    // given
+    render(<LeaderPalette />);
+
+    // when
+    triggerOpenLeaderPalette();
+
+    // then
+    const leaderPaletteElement = document.querySelector('.leader-palette');
+    expect(leaderPaletteElement).toBeInTheDocument();
+  });
+
+  it('should close leader palette when Escape key is pressed', async () => {
+    // given
+    render(<LeaderPalette />);
+    const user = userEvent.setup();
+    triggerOpenLeaderPalette();
+
+    // when
+    await user.keyboard('Escape');
+
+    // then
+    expect(screen.queryByTestId('leader-palette')).not.toBeInTheDocument();
+  });
+});
+
+describe('LeaderPalette Focus', () => {
+  const triggerOpenLeaderPalette = () => {
+    act(() => {
       const event = new CustomEvent('open-leader-palette');
       window.dispatchEvent(event);
-
-      // Wait for the component to respond to the event
-      await new Promise((resolve) => setTimeout(resolve, 0));
     });
+  };
 
-    // Check if the leader palette with the correct class name is now visible
-    const leaderPaletteElement = document.querySelector('.leader-palette');
-    expect(leaderPaletteElement).not.toBeNull();
-    expect(leaderPaletteElement).toBeInTheDocument();
-
-    // Check for specific elements within the leader palette
-    expect(screen.getByText('Leader')).toBeInTheDocument();
-    expect(screen.getByText('Choose action')).toBeInTheDocument();
-    expect(
-      screen.getByText('[j/k: ↑↓] [Enter: select] [ESC: close]')
-    ).toBeInTheDocument();
+  beforeEach(() => {
+    fakeBrowser.reset();
   });
 
-  it('should not display leader palette initially', () => {
-    // Render the LeaderPalette component
+  it('should focus on first item when leader palette is opened', async () => {
+    // given & when
     render(<LeaderPalette />);
+    triggerOpenLeaderPalette();
+    const firstItem = screen.getAllByTestId('leader-action')[0];
 
-    // The palette should not be visible initially
-    expect(document.querySelector('.leader-palette')).toBeNull();
+    // then
+    expect(firstItem).toHaveFocus();
   });
 
-  it('should handle browser extension messaging for open-leader-palette', async () => {
-    // Render the LeaderPalette component
+  it('should change focus between list items using j/k keys', async () => {
+    // given
     render(<LeaderPalette />);
+    const user = userEvent.setup();
+    triggerOpenLeaderPalette();
+    const everyItems = screen.getAllByTestId('leader-action');
 
-    // Simulate the background script sending a message to content script
-    // which then dispatches the custom event
-    const mockMessage = { action: 'open-leader-palette' };
+    // when & then
+    expect(everyItems[0]).toHaveFocus();
+    for (let i = 1; i < everyItems.length; i++) {
+      await user.keyboard('k');
+      expect(everyItems[i]).toHaveFocus();
+    }
+    for (let i = everyItems.length - 1; i >= 0; i--) {
+      await user.keyboard('j');
+      expect(everyItems[i]).toHaveFocus();
+    }
+  });
+});
 
-    // Simulate the message listener behavior from content/index.tsx wrapped in act
-    await act(async () => {
-      if (mockMessage.action === 'open-leader-palette') {
-        const event = new CustomEvent('open-leader-palette');
-        window.dispatchEvent(event);
-      }
-
-      // Wait for the event to be processed
-      await new Promise((resolve) => setTimeout(resolve, 0));
+describe('LeaderPalette Actions', () => {
+  const triggerOpenLeaderPalette = () => {
+    act(() => {
+      const event = new CustomEvent('open-leader-palette');
+      window.dispatchEvent(event);
     });
+  };
 
-    // Verify the leader palette is now visible
-    const leaderPaletteElement = document.querySelector('.leader-palette');
-    expect(leaderPaletteElement).not.toBeNull();
-    expect(leaderPaletteElement).toHaveClass('leader-palette');
+  beforeEach(() => {
+    fakeBrowser.reset();
+  });
+
+  it('should render quick-bookmark when a key is pressed', async () => {
+    // given
+    render(<LeaderPalette />);
+    const user = userEvent.setup();
+    triggerOpenLeaderPalette();
+
+    // when
+    await user.keyboard('a');
+
+    // then
+    expect(screen.getByTestId('quick-bookmark')).toBeInTheDocument();
+  });
+
+  it('should render live-grep when g key is pressed', async () => {
+    // given
+    render(<LeaderPalette />);
+    const user = userEvent.setup();
+    triggerOpenLeaderPalette();
+
+    // when
+    await user.keyboard('g');
+
+    // then
+    expect(screen.getByTestId('live-grep')).toBeInTheDocument();
+  });
+
+  it('should render bookmark-manager when b key is pressed', async () => {
+    // given
+    render(<LeaderPalette />);
+    const user = userEvent.setup();
+    triggerOpenLeaderPalette();
+
+    // when
+    await user.keyboard('b');
+
+    // then
+    expect(screen.getByTestId('bookmark-manager')).toBeInTheDocument();
   });
 });
