@@ -1,4 +1,10 @@
-/* Telescope overlay styles inspired by nvim-telescope */
+ul, ol, li {
+  display: block;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  padding-inline-start: 0;
+}
 
 /* Bookmark Manager Styles */
 .bookmark-manager-overlay {
@@ -500,7 +506,7 @@
   position: fixed;
   right: 20px;
   bottom: 20px;
-  width: 320px;
+  min-width: 320px;
   max-height: 60vh;
   background-color: #1e1e2e;
   border: 2px solid #cdd6f4;
@@ -554,7 +560,7 @@
 }
 
 .leader-palette-item:hover,
-.leader-palette-item.selected {
+.leader-palette-item:focus {
   background: #313244;
 }
 
