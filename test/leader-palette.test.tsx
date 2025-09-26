@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { fakeBrowser } from 'wxt/testing';
 import LeaderPalette from '../entrypoints/content/leader-palette/components/LeaderPalette';
+import BookmarkManager from '../entrypoints/content/manager/components/BookmarkManager';
+import BookmarkTelescope from '../entrypoints/content/telescope/BookmarkTelescope';
 
 describe('LeaderPalette Open/Close', () => {
   const triggerOpenLeaderPalette = () => {
@@ -14,6 +16,13 @@ describe('LeaderPalette Open/Close', () => {
 
   beforeEach(() => {
     fakeBrowser.reset();
+    // Add onMessage listener to respond to sendMessage calls
+    browser.runtime.onMessage.addListener((message) => {
+      if (message.action === 'add-bookmark') {
+        return Promise.resolve({ success: true });
+      }
+      return Promise.resolve({});
+    });
   });
 
   it('should not display leader palette initially', () => {
@@ -42,6 +51,8 @@ describe('LeaderPalette Open/Close', () => {
     render(<LeaderPalette />);
     const user = userEvent.setup();
     triggerOpenLeaderPalette();
+    const leaderPaletteElement = document.querySelector('.leader-palette');
+    expect(leaderPaletteElement).toBeInTheDocument();
 
     // when
     await user.keyboard('Escape');
@@ -61,12 +72,21 @@ describe('LeaderPalette Focus', () => {
 
   beforeEach(() => {
     fakeBrowser.reset();
+    // Add onMessage listener to respond to sendMessage calls
+    browser.runtime.onMessage.addListener((message) => {
+      if (message.action === 'add-bookmark') {
+        return Promise.resolve({ success: true });
+      }
+      return Promise.resolve({});
+    });
   });
 
   it('should focus on first item when leader palette is opened', async () => {
     // given & when
     render(<LeaderPalette />);
     triggerOpenLeaderPalette();
+    const leaderPaletteElement = document.querySelector('.leader-palette');
+    expect(leaderPaletteElement).toBeInTheDocument();
     const firstItem = screen.getAllByTestId('leader-action')[0];
 
     // then
@@ -78,17 +98,19 @@ describe('LeaderPalette Focus', () => {
     render(<LeaderPalette />);
     const user = userEvent.setup();
     triggerOpenLeaderPalette();
+    const leaderPaletteElement = document.querySelector('.leader-palette');
+    expect(leaderPaletteElement).toBeInTheDocument();
     const everyItems = screen.getAllByTestId('leader-action');
 
     // when & then
     expect(everyItems[0]).toHaveFocus();
     for (let i = 1; i < everyItems.length; i++) {
-      await user.keyboard('k');
-      expect(everyItems[i]).toHaveFocus();
-    }
-    for (let i = everyItems.length - 1; i >= 0; i--) {
       await user.keyboard('j');
       expect(everyItems[i]).toHaveFocus();
+    }
+    for (let i = everyItems.length - 1; i > 0; i--) {
+      expect(everyItems[i]).toHaveFocus();
+      await user.keyboard('k');
     }
   });
 });
@@ -103,13 +125,28 @@ describe('LeaderPalette Actions', () => {
 
   beforeEach(() => {
     fakeBrowser.reset();
+    // Add onMessage listener to respond to sendMessage calls
+    browser.runtime.onMessage.addListener((message) => {
+      if (message.action === 'add-bookmark') {
+        return Promise.resolve({ success: true });
+      }
+      return Promise.resolve({});
+    });
   });
 
   it('should render quick-bookmark when a key is pressed', async () => {
     // given
-    render(<LeaderPalette />);
+    render(
+      <>
+        <LeaderPalette />
+        <BookmarkTelescope />
+        <BookmarkManager />
+      </>
+    );
     const user = userEvent.setup();
     triggerOpenLeaderPalette();
+    const leaderPaletteElement = document.querySelector('.leader-palette');
+    expect(leaderPaletteElement).toBeInTheDocument();
 
     // when
     await user.keyboard('a');
@@ -120,9 +157,17 @@ describe('LeaderPalette Actions', () => {
 
   it('should render live-grep when g key is pressed', async () => {
     // given
-    render(<LeaderPalette />);
+    render(
+      <>
+        <LeaderPalette />
+        <BookmarkTelescope />
+        <BookmarkManager />
+      </>
+    );
     const user = userEvent.setup();
     triggerOpenLeaderPalette();
+    const leaderPaletteElement = document.querySelector('.leader-palette');
+    expect(leaderPaletteElement).toBeInTheDocument();
 
     // when
     await user.keyboard('g');
@@ -133,9 +178,17 @@ describe('LeaderPalette Actions', () => {
 
   it('should render bookmark-manager when b key is pressed', async () => {
     // given
-    render(<LeaderPalette />);
+    render(
+      <>
+        <LeaderPalette />
+        <BookmarkTelescope />
+        <BookmarkManager />
+      </>
+    );
     const user = userEvent.setup();
     triggerOpenLeaderPalette();
+    const leaderPaletteElement = document.querySelector('.leader-palette');
+    expect(leaderPaletteElement).toBeInTheDocument();
 
     // when
     await user.keyboard('b');
