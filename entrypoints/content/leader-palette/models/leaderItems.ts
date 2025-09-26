@@ -1,5 +1,7 @@
+export type ActionID = 'live-grep' | 'quick-bookmark' | 'bookmark-manager';
+
 export interface LeaderItem {
-  id: string;
+  id: ActionID;
   label: string;
   description: string;
   hotkeys: string[];
@@ -26,7 +28,7 @@ export const LEADER_ITEMS: LeaderItem[] = [
   }
 ];
 
-export const LEADER_ACTIONS = {
+export const LEADER_ACTIONS: Record<ActionID, () => void> = {
   'live-grep': () => {
     const event = new CustomEvent('telescope-toggle');
     window.dispatchEvent(event);
@@ -54,7 +56,7 @@ export const LEADER_ACTIONS = {
         const truncatedTitle = title.length > 40 ? title.substring(0, 37) + '...' : title;
 
         notification.innerHTML = `
-          <div class="quick-bookmark-notification">
+          <div class="quick-bookmark-notification" data-testid="quick-bookmark">
             <div class="quick-bookmark-header">
               <span class="quick-bookmark-title">Quick Bookmark</span>
             </div>
