@@ -386,6 +386,7 @@ const BookmarkManager: React.FC = () => {
       className="bookmark-manager-overlay active"
       ref={overlayRef}
       onClick={handleOverlayClick}
+      data-testid="bookmark-manager"
     >
       <div className="bookmark-manager-container">
         <div className="bookmark-manager-header">
