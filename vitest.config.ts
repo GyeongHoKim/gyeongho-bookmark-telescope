@@ -11,7 +11,7 @@ export default defineConfig({
     include: ['test/**/*.test.{ts,tsx}', 'test/**/*.spec.{ts,tsx}'],
     reporters: ['default', 'junit'],
     outputFile: {
-      junit: './test-results.xml',
+      junit: './test/test-results.xml',
     },
     coverage: {
       reporter: ['text', 'json', 'json-summary', 'html'],

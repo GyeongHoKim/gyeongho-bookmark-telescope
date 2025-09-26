@@ -6,7 +6,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-test-results.xml
+test/test-*.xml
 
 node_modules
 .output
