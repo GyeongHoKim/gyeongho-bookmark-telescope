@@ -292,6 +292,7 @@ const BookmarkTelescope: React.FC = () => {
       className="bookmark-telescope-overlay active"
       ref={overlayRef}
       onClick={handleOverlayClick}
+      data-testid="live-grep"
     >
       <div className="telescope-container">
         {/* Mode indicator */}
