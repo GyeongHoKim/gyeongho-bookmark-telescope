@@ -1,3 +1,5 @@
+import NotificationContainer from '@/entrypoints/common/components/NotificationContainer';
+import { NotificationProvider } from '@/entrypoints/common/contexts/NotificationContext';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -27,7 +29,11 @@ describe('LeaderPalette Open/Close', () => {
 
   it('should not display leader palette initially', () => {
     // given & when
-    render(<LeaderPalette />);
+    render(
+      <NotificationProvider>
+        <LeaderPalette />
+      </NotificationProvider>
+    );
 
     // then
     expect(screen.queryByTestId('leader-palette')).not.toBeInTheDocument();
@@ -36,7 +42,11 @@ describe('LeaderPalette Open/Close', () => {
 
   it('should display leader palette when open-leader-palette event is dispatched', async () => {
     // given
-    render(<LeaderPalette />);
+    render(
+      <NotificationProvider>
+        <LeaderPalette />
+      </NotificationProvider>
+    );
 
     // when
     triggerOpenLeaderPalette();
@@ -48,7 +58,11 @@ describe('LeaderPalette Open/Close', () => {
 
   it('should close leader palette when Escape key is pressed', async () => {
     // given
-    render(<LeaderPalette />);
+    render(
+      <NotificationProvider>
+        <LeaderPalette />
+      </NotificationProvider>
+    );
     const user = userEvent.setup();
     triggerOpenLeaderPalette();
     const leaderPaletteElement = document.querySelector('.leader-palette');
@@ -83,7 +97,11 @@ describe('LeaderPalette Focus', () => {
 
   it('should focus on first item when leader palette is opened', async () => {
     // given & when
-    render(<LeaderPalette />);
+    render(
+      <NotificationProvider>
+        <LeaderPalette />
+      </NotificationProvider>
+    );
     triggerOpenLeaderPalette();
     const leaderPaletteElement = document.querySelector('.leader-palette');
     expect(leaderPaletteElement).toBeInTheDocument();
@@ -95,7 +113,11 @@ describe('LeaderPalette Focus', () => {
 
   it('should change focus between list items using j/k keys', async () => {
     // given
-    render(<LeaderPalette />);
+    render(
+      <NotificationProvider>
+        <LeaderPalette />
+      </NotificationProvider>
+    );
     const user = userEvent.setup();
     triggerOpenLeaderPalette();
     const leaderPaletteElement = document.querySelector('.leader-palette');
@@ -137,11 +159,12 @@ describe('LeaderPalette Actions', () => {
   it('should render quick-bookmark when a key is pressed', async () => {
     // given
     render(
-      <>
-        <LeaderPalette />
+      <NotificationProvider>
         <BookmarkTelescope />
         <BookmarkManager />
-      </>
+        <LeaderPalette />
+        <NotificationContainer />
+      </NotificationProvider>
     );
     const user = userEvent.setup();
     triggerOpenLeaderPalette();
@@ -152,17 +175,17 @@ describe('LeaderPalette Actions', () => {
     await user.keyboard('a');
 
     // then
-    expect(screen.getByTestId('quick-bookmark')).toBeInTheDocument();
+    expect(screen.getByTestId('notification')).toBeInTheDocument();
   });
 
   it('should render live-grep when g key is pressed', async () => {
     // given
     render(
-      <>
+      <NotificationProvider>
         <LeaderPalette />
         <BookmarkTelescope />
         <BookmarkManager />
-      </>
+      </NotificationProvider>
     );
     const user = userEvent.setup();
     triggerOpenLeaderPalette();
@@ -179,11 +202,11 @@ describe('LeaderPalette Actions', () => {
   it('should render bookmark-manager when b key is pressed', async () => {
     // given
     render(
-      <>
+      <NotificationProvider>
         <LeaderPalette />
         <BookmarkTelescope />
         <BookmarkManager />
-      </>
+      </NotificationProvider>
     );
     const user = userEvent.setup();
     triggerOpenLeaderPalette();

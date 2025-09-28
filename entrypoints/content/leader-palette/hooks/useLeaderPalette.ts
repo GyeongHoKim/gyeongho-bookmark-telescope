@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActionID, LEADER_ACTIONS, LEADER_ITEMS } from '../models/leaderItems';
+import { LEADER_ITEMS } from '../models/leaderItems';
 
 export const useLeaderPalette = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -7,8 +7,8 @@ export const useLeaderPalette = () => {
   const ulRef = useRef<HTMLUListElement | null>(null);
   const containerRef = useRef<HTMLElement | null>(null);
 
-  const triggerAction = useCallback((itemId: ActionID) => {
-    LEADER_ACTIONS[itemId]();
+  const close = useCallback(() => {
+    setIsOpen(false);
   }, []);
 
   const handleKeyboardEvent = useCallback(
@@ -42,18 +42,9 @@ export const useLeaderPalette = () => {
             return (prev - 1 + LEADER_ITEMS.length) % LEADER_ITEMS.length;
           });
           break;
-        case 'Enter':
-          LEADER_ACTIONS[LEADER_ITEMS[focusIndex].id]();
-          break;
-      }
-      const actionId = LEADER_ITEMS.find((item) =>
-        item.hotkeys.includes(event.key)
-      )?.id;
-      if (actionId) {
-        LEADER_ACTIONS[actionId]();
       }
     },
-    [focusIndex, isOpen]
+    [isOpen]
   );
 
   useEffect(() => {
@@ -117,7 +108,7 @@ export const useLeaderPalette = () => {
   return {
     isOpen,
     focusIndex,
-    triggerAction,
+    close,
     ulRef,
     containerRef,
   };
