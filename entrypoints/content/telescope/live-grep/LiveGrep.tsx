@@ -35,7 +35,7 @@ const LiveGrep: React.FC<LiveGrepProps> = ({
     <div className={`telescope-search-section ${isFocused ? 'focused' : ''}`}>
       <span className="telescope-search-label">Live Grep</span>
       <div className="telescope-search-content">
-        <div className="telescope-search-mode-indicator">
+        <div className="telescope-search-mode-indicator" role="status" aria-live="polite">
           {isInsertMode && isFocused ? '-- INSERT --' : ''}
         </div>
         <input
@@ -49,7 +49,7 @@ const LiveGrep: React.FC<LiveGrepProps> = ({
           onChange={handleChange}
           readOnly={!isInsertMode}
         />
-        <span className="telescope-search-counter">
+        <span className="telescope-search-counter" role="status" aria-live="polite" aria-label="Search results count">
           {totalCount > 0 ? `${selectedCount} / ${totalCount}` : '0 / 0'}
         </span>
       </div>

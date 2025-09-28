@@ -3,6 +3,8 @@ import LeaderPalette from './leader-palette/components/LeaderPalette';
 import BookmarkManager from './manager/components/BookmarkManager';
 import './telescope.css';
 import BookmarkTelescope from './telescope/BookmarkTelescope';
+import { NotificationProvider } from '../common/contexts/NotificationContext';
+import NotificationContainer from '../common/components/NotificationContainer';
 
 export default defineContentScript({
   matches: ['<all_urls>'],
@@ -28,11 +30,12 @@ export default defineContentScript({
     // Mount React component
     const root = createRoot(container);
     root.render(
-      <>
+      <NotificationProvider>
         <BookmarkTelescope />
         <BookmarkManager />
         <LeaderPalette />
-      </>
+        <NotificationContainer />
+      </NotificationProvider>
     );
 
     // Listen for messages from background script

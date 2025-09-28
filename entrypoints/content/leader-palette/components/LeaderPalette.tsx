@@ -1,9 +1,15 @@
 import React from 'react';
+import { useLeaderActions } from '../hooks/useLeaderActions';
 import { useLeaderPalette } from '../hooks/useLeaderPalette';
 import { LEADER_ITEMS } from '../models/leaderItems';
 
 const LeaderPalette: React.FC = () => {
-  const { isOpen, ulRef, containerRef, triggerAction } = useLeaderPalette();
+  const { isOpen, focusIndex, close, ulRef, containerRef } = useLeaderPalette();
+  const { executeAction } = useLeaderActions({
+    isOpen,
+    focusIndex,
+    onClose: close,
+  });
 
   if (!isOpen) {
     return null;
@@ -31,12 +37,12 @@ const LeaderPalette: React.FC = () => {
             <button
               type="button"
               className="leader-palette-item"
-              onClick={() => triggerAction(item.id)}
+              onClick={() => executeAction(item.id)}
               onKeyDown={(event) => {
                 if (event.key === 'Enter') {
                   event.preventDefault();
                   event.stopPropagation();
-                  triggerAction(item.id);
+                  executeAction(item.id);
                 }
               }}
               data-testid="leader-action"
