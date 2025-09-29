@@ -43,6 +43,7 @@
     "postinstall": "wxt prepare"
   },
   "dependencies": {
+    "@mozilla/readability": "^0.6.0",
     "@xstate/react": "^6.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

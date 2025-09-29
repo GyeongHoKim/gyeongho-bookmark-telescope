@@ -1,85 +1,61 @@
+import { Readability } from '@mozilla/readability';
 import { useCallback, useEffect, useState } from 'react';
 
 /**
- * Advanced HTML text extraction using refined regex patterns
- * Removes scripts, styles, navigation, ads, and other noise
+ * Extract clean text from HTML using Mozilla's Readability.js
+ * This provides much better content extraction than regex-based approaches
  */
-function extractCleanTextAdvanced(html: string): string {
-  let text = html;
-
+function extractCleanTextWithReadability(html: string): string {
   try {
-    // 1. Remove scripts, styles, and comments completely
-    text = text.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
-    text = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
-    text = text.replace(/<noscript[^>]*>[\s\S]*?<\/noscript>/gi, '');
-    text = text.replace(/<!--[\s\S]*?-->/g, '');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
 
-    // 2. Remove structural elements (navigation, header, footer, sidebar)
-    text = text.replace(/<(nav|header|footer|aside)[^>]*>[\s\S]*?<\/\1>/gi, '');
-
-    // 3. Remove ads and promotional content (by common class/id patterns)
-    text = text.replace(/<[^>]*(?:class|id)="[^"]*(?:ad|advertisement|banner|sidebar|promo)[^"]*"[^>]*>[\s\S]*?<\/[^>]+>/gi, '');
-
-    // 4. Remove meta elements
-    text = text.replace(/<(meta|link|title)[^>]*\/?>/gi, '');
-
-    // 5. Remove all HTML tags
-    text = text.replace(/<[^>]*>/g, ' ');
-
-    // 6. Decode common HTML entities
-    const entities: Record<string, string> = {
-      '&amp;': '&',
-      '&lt;': '<',
-      '&gt;': '>',
-      '&quot;': '"',
-      '&#39;': "'",
-      '&apos;': "'",
-      '&nbsp;': ' ',
-      '&ndash;': '–',
-      '&mdash;': '—',
-      '&hellip;': '…',
-      '&copy;': '©',
-      '&reg;': '®',
-      '&trade;': '™'
-    };
-
-    Object.entries(entities).forEach(([entity, char]) => {
-      text = text.replace(new RegExp(entity, 'g'), char);
+    const reader = new Readability(doc, {
+      debug: false,
+      maxElemsToParse: 1000,
+      nbTopCandidates: 5,
+      charThreshold: 500,
+      classesToPreserve: ['caption', 'emoji', 'hidden'],
+      keepClasses: false,
+      disableJSONLD: true,
     });
 
-    // Decode numeric entities (&#123; and &#x1F; formats)
-    text = text.replace(/&#(\d+);/g, (_, num) => {
-      const code = parseInt(num, 10);
-      return code > 0 && code < 1114112 ? String.fromCharCode(code) : '';
-    });
-    text = text.replace(/&#x([a-fA-F0-9]+);/g, (_, hex) => {
-      const code = parseInt(hex, 16);
-      return code > 0 && code < 1114112 ? String.fromCharCode(code) : '';
-    });
+    const article = reader.parse();
 
-    // 7. Clean up whitespace
-    text = text.replace(/[\s\r\n\t]+/g, ' ');
-    text = text.replace(/\s+([,.!?;:])/g, '$1');
-    text = text.replace(/([,.!?;:])\s+/g, '$1 ');
-    text = text.trim();
+    if (article && article.textContent) {
+      let text = article.textContent;
 
-    // 8. Limit length for Chrome AI (preserve sentence boundaries)
-    if (text.length > 5000) {
-      const sentences = text.substring(0, 5000).split(/[.!?]+/);
-      sentences.pop(); // Remove potentially incomplete last sentence
-      text = sentences.join('. ');
-      if (text && !text.match(/[.!?]$/)) {
-        text += '.';
+      text = text.replace(/[\s\r\n\t]+/g, ' ');
+      text = text.replace(/\s+([,.!?;:])/g, '$1');
+      text = text.replace(/([,.!?;:])\s+/g, '$1 ');
+      text = text.trim();
+
+      if (text.length > 5000) {
+        const sentences = text.substring(0, 5000).split(/[.!?]+/);
+        sentences.pop();
+        text = sentences.join('. ');
+        if (text && !text.match(/[.!?]$/)) {
+          text += '.';
+        }
       }
+
+      return text;
     }
 
-    return text;
+    const title = doc.querySelector('title')?.textContent || '';
+    if (title.trim()) {
+      return title.trim();
+    }
+
+    throw new Error('Readability could not extract content');
   } catch (error) {
-    console.warn('Advanced text extraction failed, using fallback:', error);
-    // Fallback to simple regex approach
+    console.warn('Readability extraction failed, using fallback:', error);
+
     return html
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
       .replace(/<[^>]*>/g, ' ')
-      .replace(/\s+/g, ' ')
+      .replace(/[\s\r\n\t]+/g, ' ')
       .trim()
       .substring(0, 5000);
   }
@@ -114,7 +90,9 @@ export interface UseSummarizerResult {
   declineDownload: () => void;
 }
 
-export const useSummarizer = (options: UseSummarizerOptions = {}): UseSummarizerResult => {
+export const useSummarizer = (
+  options: UseSummarizerOptions = {}
+): UseSummarizerResult => {
   const {
     enabled = true,
     type = 'tldr',
@@ -129,7 +107,6 @@ export const useSummarizer = (options: UseSummarizerOptions = {}): UseSummarizer
   const [downloadProgress, setDownloadProgress] = useState<number>(0);
   const [summarizer, setSummarizer] = useState<SummarizerInstance | null>(null);
 
-  // Check availability
   const checkAvailability = useCallback(async () => {
     if (!enabled) {
       setStatus('idle');
@@ -139,10 +116,11 @@ export const useSummarizer = (options: UseSummarizerOptions = {}): UseSummarizer
     setStatus('checking');
 
     try {
-      // Check if Summarizer API is supported
       if (typeof Summarizer === 'undefined') {
         setStatus('unavailable');
-        setError('Chrome Built-in AI is not supported in this browser. Requires Chrome 138+ with experimental features enabled.');
+        setError(
+          'Chrome Built-in AI is not supported in this browser. Requires Chrome 138+ with experimental features enabled.'
+        );
         return;
       }
 
@@ -157,7 +135,6 @@ export const useSummarizer = (options: UseSummarizerOptions = {}): UseSummarizer
           break;
         case 'downloading': {
           setStatus('downloading');
-          // Start monitoring download progress
           const checkInterval = setInterval(async () => {
             try {
               const newAvailability = await Summarizer.availability();
@@ -179,17 +156,20 @@ export const useSummarizer = (options: UseSummarizerOptions = {}): UseSummarizer
         case 'unavailable':
         default:
           setStatus('unavailable');
-          setError('Chrome Built-in AI is not available on this device. Requirements: Windows 10/11, macOS 13+, or ChromeOS with 22GB+ free space and >4GB VRAM.');
+          setError(
+            'Chrome Built-in AI is not available on this device. Requirements: Windows 10/11, macOS 13+, or ChromeOS with 22GB+ free space and >4GB VRAM.'
+          );
           break;
       }
     } catch (err) {
       console.error('Error checking summarizer availability:', err);
       setStatus('error');
-      setError(`Failed to check AI availability: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setError(
+        `Failed to check AI availability: ${err instanceof Error ? err.message : 'Unknown error'}`
+      );
     }
   }, [enabled]);
 
-  // Accept download consent
   const acceptDownload = useCallback(async () => {
     try {
       setStatus('downloading');
@@ -201,10 +181,13 @@ export const useSummarizer = (options: UseSummarizerOptions = {}): UseSummarizer
         length,
         outputLanguage,
         monitor: (monitor) => {
-          monitor.addEventListener('downloadprogress', (e: DownloadProgressEvent) => {
-            const progress = Math.round((e.loaded || 0) * 100);
-            setDownloadProgress(progress);
-          });
+          monitor.addEventListener(
+            'downloadprogress',
+            (e: DownloadProgressEvent) => {
+              const progress = Math.round((e.loaded || 0) * 100);
+              setDownloadProgress(progress);
+            }
+          );
         },
       });
 
@@ -216,110 +199,131 @@ export const useSummarizer = (options: UseSummarizerOptions = {}): UseSummarizer
       setStatus('error');
       const errorMsg = err instanceof Error ? err.message : 'Unknown error';
       if (errorMsg.includes('service is not running')) {
-        setError('Chrome AI service is not running. Please enable Chrome AI flags and restart Chrome: chrome://flags/#optimization-guide-on-device-model');
+        setError(
+          'Chrome AI service is not running. Please enable Chrome AI flags and restart Chrome: chrome://flags/#optimization-guide-on-device-model'
+        );
       } else {
         setError(`Failed to download AI model: ${errorMsg}`);
       }
     }
   }, [type, format, length, outputLanguage]);
 
-  // Decline download
   const declineDownload = useCallback(() => {
     setStatus('unavailable');
-    setError('User declined AI model download. Chrome Built-in AI summarization is not available.');
+    setError(
+      'User declined AI model download. Chrome Built-in AI summarization is not available.'
+    );
   }, []);
 
-  // Create summarizer instance if needed
-  const ensureSummarizer = useCallback(async (): Promise<SummarizerInstance | null> => {
-    if (summarizer) {
-      return summarizer;
-    }
+  const ensureSummarizer =
+    useCallback(async (): Promise<SummarizerInstance | null> => {
+      if (summarizer) {
+        return summarizer;
+      }
 
-    if (status === 'available') {
+      if (status === 'available') {
+        try {
+          const newSummarizer = await Summarizer.create({
+            type,
+            format,
+            length,
+            outputLanguage,
+          });
+          setSummarizer(newSummarizer);
+          setStatus('available');
+          return newSummarizer;
+        } catch (err) {
+          console.error('Error creating summarizer:', err);
+          setStatus('error');
+          setError(
+            `Failed to create summarizer: ${err instanceof Error ? err.message : 'Unknown error'}`
+          );
+          return null;
+        }
+      }
+
+      return null;
+    }, [summarizer, status, type, format, length, outputLanguage]);
+
+  const summarize = useCallback(
+    async (text: string) => {
+      if (!text || !text.trim()) {
+        setSummary('');
+        return;
+      }
+
+      if (status === 'idle') {
+        throw new Error(
+          'Summarizer not initialized. Please wait for initialization to complete.'
+        );
+      }
+
+      if (status === 'checking') {
+        throw new Error(
+          'Summarizer availability check in progress. Please wait.'
+        );
+      }
+
+      if (status === 'downloadable') {
+        throw new Error(
+          'User consent required for AI model download. Please accept or decline the download.'
+        );
+      }
+
+      if (status === 'downloading') {
+        throw new Error(
+          'AI model download in progress. Please wait for download to complete.'
+        );
+      }
+
+      if (status === 'unavailable') {
+        throw new Error(
+          'Chrome Built-in AI is not supported on this device or browser.'
+        );
+      }
+
+      if (status === 'error') {
+        throw new Error(
+          'Summarizer is in error state. Please try again later.'
+        );
+      }
+
+      if (status === 'completed') {
+        throw new Error(
+          'Summary already completed. Refresh content to generate a new summary.'
+        );
+      }
+
+      if (status !== 'available') {
+        throw new Error(`Invalid summarizer state: ${status}`);
+      }
+
       try {
-        const newSummarizer = await Summarizer.create({
-          type,
-          format,
-          length,
-          outputLanguage,
+        setStatus('summarizing');
+
+        const summarizerInstance = await ensureSummarizer();
+        if (!summarizerInstance) {
+          throw new Error('Failed to create summarizer instance');
+        }
+
+        const textOnly = extractCleanTextWithReadability(text);
+
+        const result = await summarizerInstance.summarize(textOnly, {
+          context: 'Article from bookmark',
         });
-        setSummarizer(newSummarizer);
-        setStatus('available');
-        return newSummarizer;
+
+        setSummary(result);
+        setStatus('completed');
       } catch (err) {
-        console.error('Error creating summarizer:', err);
+        console.error('Error generating AI summary:', err);
         setStatus('error');
-        setError(`Failed to create summarizer: ${err instanceof Error ? err.message : 'Unknown error'}`);
-        return null;
+        setError(
+          `Failed to generate AI summary: ${err instanceof Error ? err.message : 'Unknown error'}`
+        );
       }
-    }
-
-    return null;
-  }, [summarizer, status, type, format, length, outputLanguage]);
-
-  // Summarize text
-  const summarize = useCallback(async (text: string) => {
-    if (!text || !text.trim()) {
-      setSummary('');
-      return;
-    }
-
-    // Check if summarizer is in a valid state for summarization
-    if (status === 'idle') {
-      throw new Error('Summarizer not initialized. Please wait for initialization to complete.');
-    }
-
-    if (status === 'checking') {
-      throw new Error('Summarizer availability check in progress. Please wait.');
-    }
-
-    if (status === 'downloadable') {
-      throw new Error('User consent required for AI model download. Please accept or decline the download.');
-    }
-
-    if (status === 'downloading') {
-      throw new Error('AI model download in progress. Please wait for download to complete.');
-    }
-
-    if (status === 'unavailable') {
-      throw new Error('Chrome Built-in AI is not supported on this device or browser.');
-    }
-
-    if (status === 'error') {
-      throw new Error('Summarizer is in error state. Please try again later.');
-    }
-
-    if (status === 'completed') {
-      throw new Error('Summary already completed. Refresh content to generate a new summary.');
-    }
-
-    if (status !== 'available') {
-      throw new Error(`Invalid summarizer state: ${status}`);
-    }
-
-    try {
-      setStatus('summarizing');
-
-      const summarizerInstance = await ensureSummarizer();
-      if (!summarizerInstance) {
-        throw new Error('Failed to create summarizer instance');
-      }
-
-      // Extract clean text for summarization using advanced regex patterns
-      const textOnly = extractCleanTextAdvanced(text);
-
-      const result = await summarizerInstance.summarize(textOnly, {
-        context: 'Article from bookmark',
-      });
-
-      setSummary(result);
-      setStatus('completed');
-    } catch (err) {
-      console.error('Error generating AI summary:', err);
-      setStatus('error');
-      setError(`Failed to generate AI summary: ${err instanceof Error ? err.message : 'Unknown error'}`);
-    }
-  }, [status, ensureSummarizer]);
+    },
+    [status, ensureSummarizer]
+  );
 
   // Initialize on mount
   useEffect(() => {
