@@ -7,11 +7,12 @@ import Preview from './preview/Preview';
 
 const BookmarkTelescope: React.FC = () => {
   const [state, send] = useMachine(telescopeMachine);
+  const stateRef = useRef(state);
   const [isVisible, setIsVisible] = useState(false);
+  const isVisibleRef = useRef<boolean>(false);
   const overlayRef = useRef<HTMLDivElement>(null);
 
   const {
-    activePanel,
     previewTab,
     selectedBookmarkIndex,
     bookmarks,
@@ -22,22 +23,27 @@ const BookmarkTelescope: React.FC = () => {
     isLoading,
   } = state.context;
 
-  const isNormalMode = state.matches('normal');
   const isInsertMode = state.matches('insert');
+  const isBookmarkListFocused = state.matches('normal.bookmarkList');
+  const isLiveGrepFocused =
+    state.matches('normal.liveGrep') || state.matches('insert.liveGrep');
+  const isPreviewFocused = state.matches('normal.preview');
 
   // Load bookmarks
   const loadBookmarks = useCallback(async () => {
-    return new Promise<void>((resolve) => {
-      browser.runtime.sendMessage({ action: 'get-bookmarks' }, (response) => {
-        if (response.error) {
-          console.error('Content: Error loading bookmarks:', response.error);
-        }
-        const loadedBookmarks: Bookmark[] = response.bookmarks || [];
-        send({ type: 'SET_BOOKMARKS', bookmarks: loadedBookmarks });
-        send({ type: 'SET_FILTERED_BOOKMARKS', bookmarks: loadedBookmarks });
-        resolve();
-      });
-    });
+    try {
+      const response = await browser.runtime.sendMessage({ action: 'get-bookmarks' });
+      if (response?.error) {
+        console.error('Content: Error loading bookmarks:', response.error);
+      }
+      const loadedBookmarks: Bookmark[] = response?.bookmarks || [];
+      send({ type: 'SET_BOOKMARKS', bookmarks: loadedBookmarks });
+      send({ type: 'SET_FILTERED_BOOKMARKS', bookmarks: loadedBookmarks });
+    } catch (error) {
+      console.error('Content: Failed to load bookmarks:', error);
+      send({ type: 'SET_BOOKMARKS', bookmarks: [] });
+      send({ type: 'SET_FILTERED_BOOKMARKS', bookmarks: [] });
+    }
   }, [send]);
 
   // Filter bookmarks based on search query
@@ -68,9 +74,12 @@ const BookmarkTelescope: React.FC = () => {
 
   // Hide telescope
   const hide = useCallback(() => {
+    isVisibleRef.current = false;
     setIsVisible(false);
-    send({ type: 'EXIT_INSERT_MODE' });
-  }, [send]);
+    if (isInsertMode) {
+      send({ type: 'EXIT_INSERT_MODE' });
+    }
+  }, [send, isInsertMode]);
 
   // Open selected bookmark
   const openSelectedBookmark = useCallback(() => {
@@ -90,6 +99,7 @@ const BookmarkTelescope: React.FC = () => {
 
   // Show telescope
   const show = useCallback(async () => {
+    isVisibleRef.current = true;
     setIsVisible(true);
     send({ type: 'UPDATE_SEARCH', query: '' });
     send({ type: 'FOCUS_PANEL', panel: 'bookmarkList' });
@@ -118,42 +128,56 @@ const BookmarkTelescope: React.FC = () => {
     });
     send({ type: 'SET_LOADING', isLoading: true });
 
-    browser.runtime.sendMessage(
-      {
+    try {
+      const response = await browser.runtime.sendMessage({
         action: 'fetch-page-content',
         url: bookmark.url,
-      },
-      (response) => {
-        send({ type: 'SET_LOADING', isLoading: false });
-        if (response.error) {
-          send({
-            type: 'SET_PREVIEW',
-            content: `Error loading preview: ${response.error}`,
-            header: bookmark.url,
-          });
-        } else {
-          const maxLength = 5000;
-          const truncatedHtml =
-            response.html.length > maxLength
-              ? response.html.substring(0, maxLength) + '\n\n... (truncated)'
-              : response.html;
-          send({
-            type: 'SET_PREVIEW',
-            content: truncatedHtml,
-            header: bookmark.url,
-          });
-        }
+      });
+      send({ type: 'SET_LOADING', isLoading: false });
+      if (response?.error) {
+        send({
+          type: 'SET_PREVIEW',
+          content: `Error loading preview: ${response.error}`,
+          header: bookmark.url,
+        });
+      } else {
+        const html: string = response?.html ?? '';
+        const maxLength = 5000;
+        const truncatedHtml =
+          html.length > maxLength
+            ? html.substring(0, maxLength) + '\n\n... (truncated)'
+            : html;
+        send({
+          type: 'SET_PREVIEW',
+          content: truncatedHtml,
+          header: bookmark.url,
+        });
       }
-    );
+    } catch (error) {
+      send({ type: 'SET_LOADING', isLoading: false });
+      send({
+        type: 'SET_PREVIEW',
+        content: `Error loading preview: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        header: bookmark.url,
+      });
+    }
   }, [filteredBookmarks, selectedBookmarkIndex, send]);
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (!isVisible) return;
+      if (!isVisibleRef.current) return;
+
+      const current = stateRef.current;
+      const normal = current.matches('normal');
+      const insert = current.matches('insert');
+      const bookmarkListFocused = current.matches('normal.bookmarkList');
+      const liveGrepFocused =
+        current.matches('normal.liveGrep') || current.matches('insert.liveGrep');
+      const previewFocused = current.matches('normal.preview');
 
       // Normal mode keys
-      if (isNormalMode) {
+      if (normal) {
         switch (e.key) {
           case 'h':
           case 'ArrowLeft':
@@ -167,33 +191,35 @@ const BookmarkTelescope: React.FC = () => {
             break;
           case 'j':
           case 'ArrowDown':
-            if (activePanel === 'bookmarkList') {
+            if (bookmarkListFocused) {
               e.preventDefault();
               send({ type: 'NEXT_BOOKMARK' });
             }
             break;
           case 'k':
           case 'ArrowUp':
-            if (activePanel === 'bookmarkList') {
+            if (bookmarkListFocused) {
               e.preventDefault();
               send({ type: 'PREV_BOOKMARK' });
             }
             break;
           case 'i':
           case 'I':
-            if (activePanel === 'liveGrep') {
+            if (liveGrepFocused) {
               e.preventDefault();
               send({ type: 'ENTER_INSERT_MODE' });
             }
             break;
-          case '[':
-            if (activePanel === 'preview') {
+        case '[':
+        case 'BracketLeft':
+            if (previewFocused) {
               e.preventDefault();
               send({ type: 'PREV_PREVIEW_TAB' });
             }
             break;
-          case ']':
-            if (activePanel === 'preview') {
+        case ']':
+        case 'BracketRight':
+            if (previewFocused) {
               e.preventDefault();
               send({ type: 'NEXT_PREVIEW_TAB' });
             }
@@ -211,22 +237,14 @@ const BookmarkTelescope: React.FC = () => {
       }
 
       // Insert mode keys
-      if (isInsertMode) {
+      if (insert) {
         if (e.key === 'Escape') {
           e.preventDefault();
           send({ type: 'EXIT_INSERT_MODE' });
         }
       }
     },
-    [
-      isVisible,
-      isNormalMode,
-      isInsertMode,
-      activePanel,
-      send,
-      openSelectedBookmark,
-      hide,
-    ]
+    [send, openSelectedBookmark, hide]
   );
 
   // Handle click outside
@@ -261,12 +279,16 @@ const BookmarkTelescope: React.FC = () => {
   }, [searchQuery, filterBookmarks]);
 
   useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
+
+  useEffect(() => {
     updatePreview();
   }, [updatePreview]);
 
   useEffect(() => {
     const handleToggle = () => {
-      if (isVisible) {
+      if (isVisibleRef.current) {
         hide();
       } else {
         show();
@@ -280,7 +302,7 @@ const BookmarkTelescope: React.FC = () => {
       window.removeEventListener('telescope-toggle', handleToggle);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isVisible, handleKeyDown, show, hide]);
+  }, [handleKeyDown, show, hide]);
 
   if (!isVisible) return null;
 
@@ -307,14 +329,14 @@ const BookmarkTelescope: React.FC = () => {
             selectedIndex={selectedBookmarkIndex}
             onSelectBookmark={handleSelectBookmark}
             onOpenBookmark={openSelectedBookmark}
-            isFocused={activePanel === 'bookmarkList'}
+            isFocused={isBookmarkListFocused}
           />
 
           <Preview
             previewContent={previewContent}
             previewHeader={previewHeader}
             isLoading={isLoading}
-            isFocused={activePanel === 'preview'}
+            isFocused={isPreviewFocused}
             activeTab={previewTab}
           />
         </div>
@@ -323,7 +345,7 @@ const BookmarkTelescope: React.FC = () => {
         <LiveGrep
           searchQuery={searchQuery}
           onSearchChange={handleSearchChange}
-          isFocused={activePanel === 'liveGrep'}
+          isFocused={isLiveGrepFocused}
           isInsertMode={isInsertMode}
           totalCount={totalCount}
           selectedCount={selectedCount}
