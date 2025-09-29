@@ -41,8 +41,6 @@ type TelescopeEvent =
   | { type: 'OPEN_BOOKMARK' }
   | { type: 'CLOSE_TELESCOPE' };
 
-const panels: Panel[] = ['bookmarkList', 'liveGrep', 'preview'];
-
 export const telescopeMachine = createMachine({
   id: 'telescope',
   types: {} as {
@@ -51,11 +49,11 @@ export const telescopeMachine = createMachine({
   },
   initial: 'normal',
   context: {
-    activePanel: 'bookmarkList' as Panel,
-    previewTab: 'summarize' as PreviewTab,
+    activePanel: 'bookmarkList',
+    previewTab: 'summarize',
     selectedBookmarkIndex: 0,
-    bookmarks: [] as Bookmark[],
-    filteredBookmarks: [] as Bookmark[],
+    bookmarks: [],
+    filteredBookmarks: [],
     searchQuery: '',
     previewContent: 'Select a bookmark to preview',
     previewHeader: '',
@@ -63,133 +61,119 @@ export const telescopeMachine = createMachine({
   },
   states: {
     normal: {
+      initial: 'bookmarkList',
+      states: {
+        bookmarkList: {
+          id: 'normal_bookmarkList',
+          entry: assign({ activePanel: 'bookmarkList' }),
+          on: {
+            NEXT_PANEL: { target: '#normal_liveGrep' },
+            PREV_PANEL: { target: '#normal_preview' },
+            NEXT_BOOKMARK: {
+              actions: assign({
+                selectedBookmarkIndex: ({ context }) => {
+                  if (context.filteredBookmarks.length === 0) return 0;
+                  return (context.selectedBookmarkIndex + 1) % context.filteredBookmarks.length;
+                },
+              }),
+            },
+            PREV_BOOKMARK: {
+              actions: assign({
+                selectedBookmarkIndex: ({ context }) => {
+                  if (context.filteredBookmarks.length === 0) return 0;
+                  return (context.selectedBookmarkIndex - 1 + context.filteredBookmarks.length) % context.filteredBookmarks.length;
+                },
+              }),
+            },
+            SELECT_BOOKMARK: {
+              actions: assign({
+                selectedBookmarkIndex: ({ event }) => event.index,
+              }),
+            },
+          },
+        },
+        liveGrep: {
+          id: 'normal_liveGrep',
+          entry: assign({ activePanel: 'liveGrep' }),
+          on: {
+            NEXT_PANEL: { target: '#normal_preview' },
+            PREV_PANEL: { target: '#normal_bookmarkList' },
+            ENTER_INSERT_MODE: { target: '#insert_liveGrep' },
+          },
+        },
+        preview: {
+          id: 'normal_preview',
+          entry: assign({ activePanel: 'preview' }),
+          on: {
+            NEXT_PANEL: { target: '#normal_bookmarkList' },
+            PREV_PANEL: { target: '#normal_liveGrep' },
+            NEXT_PREVIEW_TAB: {
+              actions: assign({
+                previewTab: ({ context }) => (context.previewTab === 'html' ? 'summarize' : 'html'),
+              }),
+            },
+            PREV_PREVIEW_TAB: {
+              actions: assign({
+                previewTab: ({ context }) => (context.previewTab === 'html' ? 'summarize' : 'html'),
+              }),
+            },
+          },
+        },
+      },
       on: {
-        NEXT_PANEL: {
-          actions: assign({
-            activePanel: ({ context }) => {
-              const currentIndex = panels.indexOf(context.activePanel);
-              const nextIndex = (currentIndex + 1) % panels.length;
-              return panels[nextIndex];
-            },
-          }),
-        },
-        PREV_PANEL: {
-          actions: assign({
-            activePanel: ({ context }) => {
-              const currentIndex = panels.indexOf(context.activePanel);
-              const prevIndex = (currentIndex - 1 + panels.length) % panels.length;
-              return panels[prevIndex];
-            },
-          }),
-        },
-        FOCUS_PANEL: {
-          actions: assign({
-            activePanel: ({ event }) => event.panel,
-          }),
-        },
-        ENTER_INSERT_MODE: {
-          target: 'insert',
-          guard: ({ context }) => context.activePanel === 'liveGrep',
-        },
-        NEXT_BOOKMARK: {
-          actions: assign({
-            selectedBookmarkIndex: ({ context }) => {
-              if (context.filteredBookmarks.length === 0) return 0;
-              return (context.selectedBookmarkIndex + 1) % context.filteredBookmarks.length;
-            },
-          }),
-        },
-        PREV_BOOKMARK: {
-          actions: assign({
-            selectedBookmarkIndex: ({ context }) => {
-              if (context.filteredBookmarks.length === 0) return 0;
-              return (context.selectedBookmarkIndex - 1 + context.filteredBookmarks.length) % context.filteredBookmarks.length;
-            },
-          }),
-        },
-        SELECT_BOOKMARK: {
-          actions: assign({
-            selectedBookmarkIndex: ({ event }) => event.index,
-          }),
-        },
-        NEXT_PREVIEW_TAB: {
-          actions: assign({
-            previewTab: ({ context }) => context.previewTab === 'html' ? 'summarize' : 'html',
-          }),
-        },
-        PREV_PREVIEW_TAB: {
-          actions: assign({
-            previewTab: ({ context }) => context.previewTab === 'html' ? 'summarize' : 'html',
-          }),
-        },
-        UPDATE_SEARCH: {
-          actions: assign({
-            searchQuery: ({ event }) => event.query,
-            selectedBookmarkIndex: () => 0,
-          }),
-        },
-        SET_BOOKMARKS: {
-          actions: assign({
-            bookmarks: ({ event }) => event.bookmarks,
-          }),
-        },
-        SET_FILTERED_BOOKMARKS: {
-          actions: assign({
-            filteredBookmarks: ({ event }) => event.bookmarks,
-          }),
-        },
-        SET_PREVIEW: {
-          actions: assign({
-            previewContent: ({ event }) => event.content,
-            previewHeader: ({ event }) => event.header,
-          }),
-        },
-        SET_LOADING: {
-          actions: assign({
-            isLoading: ({ event }) => event.isLoading,
-          }),
-        },
-        OPEN_BOOKMARK: {
-          // This will be handled by the component
-        },
-        CLOSE_TELESCOPE: {
-          // This will be handled by the component
-        },
+        FOCUS_PANEL: [
+          { guard: ({ event }) => event.panel === 'bookmarkList', target: '.bookmarkList' },
+          { guard: ({ event }) => event.panel === 'liveGrep', target: '.liveGrep' },
+          { guard: ({ event }) => event.panel === 'preview', target: '.preview' },
+        ],
       },
     },
     insert: {
-      on: {
-        EXIT_INSERT_MODE: {
-          target: 'normal',
-        },
-        UPDATE_SEARCH: {
-          actions: assign({
-            searchQuery: ({ event }) => event.query,
-            selectedBookmarkIndex: () => 0,
-          }),
-        },
-        SET_BOOKMARKS: {
-          actions: assign({
-            bookmarks: ({ event }) => event.bookmarks,
-          }),
-        },
-        SET_FILTERED_BOOKMARKS: {
-          actions: assign({
-            filteredBookmarks: ({ event }) => event.bookmarks,
-          }),
-        },
-        SET_PREVIEW: {
-          actions: assign({
-            previewContent: ({ event }) => event.content,
-            previewHeader: ({ event }) => event.header,
-          }),
-        },
-        SET_LOADING: {
-          actions: assign({
-            isLoading: ({ event }) => event.isLoading,
-          }),
+      initial: 'liveGrep',
+      states: {
+        liveGrep: {
+          id: 'insert_liveGrep',
+          entry: assign({ activePanel: 'liveGrep' }),
+          on: {
+            EXIT_INSERT_MODE: { target: '#normal_liveGrep' },
+          },
         },
       },
+    },
+  },
+  on: {
+    UPDATE_SEARCH: {
+      actions: assign({
+        searchQuery: ({ event }) => event.query,
+        selectedBookmarkIndex: () => 0,
+      }),
+    },
+    SET_BOOKMARKS: {
+      actions: assign({
+        bookmarks: ({ event }) => event.bookmarks,
+      }),
+    },
+    SET_FILTERED_BOOKMARKS: {
+      actions: assign({
+        filteredBookmarks: ({ event }) => event.bookmarks,
+      }),
+    },
+    SET_PREVIEW: {
+      actions: assign({
+        previewContent: ({ event }) => event.content,
+        previewHeader: ({ event }) => event.header,
+      }),
+    },
+    SET_LOADING: {
+      actions: assign({
+        isLoading: ({ event }) => event.isLoading,
+      }),
+    },
+    OPEN_BOOKMARK: {
+      // This will be handled by the component
+    },
+    CLOSE_TELESCOPE: {
+      // This will be handled by the component
     },
   },
 });
