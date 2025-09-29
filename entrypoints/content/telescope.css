@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 ul, ol, li {
   display: block;
   list-style: none;
@@ -540,9 +544,13 @@ ul, ol, li {
 .leader-palette-list {
   display: flex;
   flex-direction: column;
-  padding: 6px;
   gap: 6px;
   overflow-y: auto;
+  width: 100%;
+}
+
+.leader-palette-list li {
+  width: 100%;
 }
 
 .leader-palette-item {
@@ -557,6 +565,7 @@ ul, ol, li {
   align-items: center;
   gap: 10px;
   cursor: pointer;
+  width: 100%;
 }
 
 .leader-palette-item:hover,
