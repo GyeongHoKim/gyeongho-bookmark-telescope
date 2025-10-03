@@ -17,7 +17,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Product Overview
 
-**LazyBookmark** is a Chrome/Firefox browser extension built with **WXT framework** and **React** that provides an nvim-telescope-like interface for searching, previewing, and managing bookmarks. Available on [Chrome Web Store](https://chromewebstore.google.com/detail/apapcobjnbpmndcpcedjhngmgocjancj).
+**LazyBookmark** is a Chrome/Firefox browser extension built with **WXT framework** and **React** that provides an lazydocker, lazyvim, lazygit, lazysth like interface for searching, previewing, and managing bookmarks. Available on [Chrome Web Store](https://chromewebstore.google.com/detail/apapcobjnbpmndcpcedjhngmgocjancj).
 
 ### Architecture Overview
 
@@ -30,32 +30,35 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `wxt.config.ts` - WXT configuration with React module and manifest settings
 
 **Extension Architecture:**
-- **Background Script**: Fetches bookmarks via Chrome API, handles cross-origin requests for page previews, manages AI features
+- **Background Script**: Fetches bookmarks via Chrome API, handles cross-origin requests for page previews
 - **Content Script**: Injects React telescope UI into any webpage, communicates with background via message passing
 - **React Component**: Implements live search with regex support, keyboard navigation, and HTML preview pane
-- **Leader Palette**: LazyVim/LazyGit inspired command palette system (Ctrl+Shift+L → g for bookmarks)
+
+**Key Components:**
+- Leader palette: LazyVim inspired command palette system (Cmd + Shift + L)
+- Bookmark Telescope: Live grep bookmarks and preview them with Chrome Built-in AI features
+- Bookmark Manager: Tree view of bookmarks with add, edit, delete actions
 
 **Key Features:**
 - Leader palette interface inspired by LazyVim/LazyGit
 - Live grep bookmarks with regex support
-- Preview pane showing bookmark summaries or HTML content
+- Preview pane showing bookmark summaries using Chrome Built-in AI features
 - LazySth-style dark theme with keyboard-centric navigation
-- AI-powered features using Gemini API
-- Cross-browser support (Chrome/Firefox)
 
 **Communication Flow:**
 1. Background script receives keyboard command
-2. Sends message to content script to toggle telescope
-3. Content script shows/hides React component
-4. React component requests bookmarks from background
-5. Background fetches from Chrome bookmarks API
-6. React component filters and displays results with live preview
+2. Sends message to content script to toggle Leader palette
+3. React component requests bookmarks from background
+4. Background fetches bookmarks from Chrome bookmarks API
+5. React component filters and displays results with live preview(using Chrome Built-in AI features)
 
-**Permissions Required:**
-- `bookmarks` - Access browser bookmarks
-- `tabs` - Query active tab and create new tabs
-- `activeTab` - Send messages to content scripts
-- `scripting` - Inject content scripts dynamically
+**Chrome Built-in AI APIs:**
+
+These APIs are origin trial program(AI agents may have outdated information) of Chrome, so **AI agents must search for the latest information using Web Search or Context7 mcp tools(MDN documentation)
+
+- Summarizer API: To determine if the model is ready to use, call the asynchronous `Summarizer.availability()` method.
+- Writer API: To determine if the model is ready to use, call the asynchronous `Writer.availability()` method.
+- Prompt API: To determine if the model is ready to use, call the asynchronous `LanguageModel.availability()` method.
 
 ## File Structure
 
