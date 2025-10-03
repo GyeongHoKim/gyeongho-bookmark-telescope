@@ -1,129 +1,195 @@
-<!-- Sync Impact Report
-Version Change: 0.0.0 → 1.0.0 (Initial constitution creation)
-Modified Principles: N/A (new creation)
-Added Sections: All sections newly created
-Removed Sections: None
-Templates Requiring Updates:
-✅ plan-template.md - Constitution check gates will reference these principles
-✅ spec-template.md - Aligned with quality and testing requirements
-✅ tasks-template.md - TDD and testing phases align with Principle III
-Follow-up TODOs: Ratification date pending user confirmation
+<!--
+  SYNC IMPACT REPORT
+  ==================
+  Version Change: 1.0.0 → 1.1.0
+
+  Modified Principles:
+  - Added: V. Chrome Built-in AI API Standards (new principle)
+
+  Added Sections:
+  - Chrome Built-in AI API Standards (Principle V) - Mandatory research requirements for Summarizer API, Prompt API, Writer API
+
+  Removed Sections: None
+
+  Templates Requiring Updates:
+  ✅ plan-template.md - Constitution Check section requires update with new principle V
+  ✅ spec-template.md - Verified alignment with principles
+  ✅ tasks-template.md - Constitution Compliance Reminders section requires update
+  ⚠ CLAUDE.md - Already contains Chrome Built-in AI guidance, constitution adds formal principle
+
+  Follow-up TODOs: None
 -->
 
-# LazyBookmark Project Constitution
+# LazyBookmark Constitution
 
 ## Core Principles
 
-### I. Code Quality First
-Every code modification MUST pass ESLint validation and TypeScript compilation before being considered complete. No exceptions. Use `npm run lint` and `npm run compile` to validate all changes. Automatic fixes via `npm run lint:fix` are encouraged where available. Code quality is not negotiable - broken builds are unacceptable.
+### I. Code Quality & Validation (NON-NEGOTIABLE)
 
-**Rationale**: High code quality prevents technical debt accumulation and ensures maintainability. TypeScript's type safety and ESLint's consistent formatting reduce bugs and improve developer experience.
+**All code modifications MUST pass both ESLint validation and TypeScript compilation before being considered complete.**
 
-### II. User Experience Consistency
-The extension MUST maintain the LazyVim/LazyGit-inspired interface paradigm across all features. Every new UI component must follow the established dark theme, keyboard-centric navigation patterns, and leader palette command structure. Visual and interaction consistency is paramount for power users.
+Requirements:
+- Run `npm run compile` after every code modification to ensure TypeScript type safety
+- Run `npm run lint` after every code modification to ensure code quality standards
+- Use `npm run lint:fix` for automatic fixes where possible
+- Never ignore or disable ESLint rules without explicit justification
+- Fix all errors and warnings before committing code
+- Zero tolerance policy: No commits with linting errors or TypeScript compilation errors
 
-**Rationale**: Users rely on muscle memory and consistent patterns. Breaking the established UX paradigm damages the core value proposition of a vim-telescope-like bookmark manager.
+**Rationale**: Type safety and code quality standards prevent runtime errors, improve maintainability, and ensure consistent code style across the codebase. Automated validation catches issues early in the development cycle.
 
-### III. Test-First Development (NON-NEGOTIABLE)
-All new features and bug fixes require tests written BEFORE implementation. The Red-Green-Refactor cycle is mandatory:
-1. Write failing tests that specify expected behavior
-2. Implement minimum code to pass tests
-3. Refactor while keeping tests green
-No pull request without accompanying tests. Integration tests required for cross-component features.
+### II. Testing Standards (NON-NEGOTIABLE)
 
-**Rationale**: TDD ensures features work as specified, prevents regressions, and serves as living documentation. The extension's complexity requires confidence in changes.
+**Unit Tests MUST target pure TypeScript business logic; avoid unit testing React components or custom hooks.**
+**All React components MUST be tested with Component(integration) tests, and Snapshot tests using `@testing-library/react`**
 
-### IV. Cross-Browser Compatibility
-All features MUST work identically on Chrome and Firefox. Use WXT framework's cross-browser APIs exclusively. Test on both browsers before considering any feature complete. Platform-specific code requires explicit justification and fallback behavior.
+Requirements:
+- All tests MUST be written in the `test/` folder using `@testing-library/react` and Vitest
+- Unit tests MUST focus exclusively on pure TypeScript classes and functions
+- Do NOT write unit tests for custom hooks or React components, React components should be handled by Component(integration) tests and Snapshot tests using `@testing-library/react`
+- Component(integration) tests may cover the interaction between business logic and UI
+- Follow TDD where appropriate: write tests, ensure they fail, then implement
 
-**Rationale**: Supporting multiple browsers expands user reach and forces better architectural decisions through abstraction.
+**Rationale**: Unit Testing pure business logic provides stable, reliable tests that don't break with UI changes. Component(integration) tests and Snapshot tests using `@testing-library/react` ensure the React components are working as expected.
 
-### V. Performance Standards
-Extension performance targets are non-negotiable:
-- Leader palette must open within 100ms of keyboard shortcut
-- Bookmark search must return results within 50ms for up to 10,000 bookmarks
-- Preview pane must render within 200ms of selection
-- Memory footprint must stay under 50MB during normal operation
-Performance regression blocks releases.
+### III. Architecture & Separation of Concerns (NON-NEGOTIABLE)
 
-**Rationale**: Performance directly impacts user productivity. Slow tools interrupt flow state and diminish the value of keyboard-driven interfaces.
+**React components MUST NOT contain business logic. Business logic MUST be implemented as pure TypeScript classes or functions, wrapped in custom hooks, then imported by components.**
 
-### VI. Privacy and Security by Design
-The extension MUST NOT:
-- Store user data outside the browser's secure storage APIs
-- Transmit bookmark data without explicit user consent
-- Execute remote code or eval() statements
-- Request permissions beyond documented requirements
-All AI features must be opt-in with clear data usage disclosure.
+Requirements:
+- Business logic MUST be implemented as pure TypeScript classes or functions
+- Custom hooks MUST wrap pure TypeScript business logic to provide React integration
+- React components MUST only handle presentation and user interaction
+- Components import and use custom hooks, not raw business logic
+- This three-layer architecture (pure logic → custom hook → component) is mandatory
+- State machines and complex state logic belong in pure TypeScript (e.g., XState machines)
 
-**Rationale**: Bookmarks contain sensitive information. Trust is earned through transparent, minimal data handling and respect for user privacy.
+**Rationale**: Separating business logic from presentation enables better testability, reusability, and maintainability. Pure TypeScript logic can be tested independently, reused across components, and modified without affecting the UI. This architecture makes the codebase more maintainable long-term.
 
-### VII. Incremental Enhancement
-Start with the simplest working implementation, then enhance. Features must be:
-- Independently toggleable via settings
-- Backward compatible with existing bookmarks
-- Gracefully degradable when dependencies fail
-- Released behind feature flags when experimental
-YAGNI (You Aren't Gonna Need It) principle applies until proven otherwise.
+### IV. LazySth Style Consistency
 
-**Rationale**: Complexity kills maintainability. Simple foundations enable sustainable growth and easier debugging.
+**UI/UX MUST maintain consistency with LazySth-inspired design: dark theme, keyboard-centric navigation, and minimal visual noise.**
 
-## Development Standards
+Requirements:
+- Dark theme styling for all UI components
+- Keyboard shortcuts MUST follow vim-like conventions where applicable (j/k navigation, etc.)
+- Leader palette system (Cmd/Ctrl+Shift+L) as primary interface
+- Minimize mouse interaction requirements
+- Console-style, terminal-inspired aesthetics
+- Visual consistency with existing telescope and leader palette components
+- Reference `CHROME_KEYBOARD_SHORTCUT.md` when implementing new keyboard shortcuts
+- Verify shortcuts don't conflict with Chrome defaults across Windows/Linux and Mac
 
-### Code Review Requirements
-- Every PR requires at least one review before merge
-- All CI checks (lint, compile, test) must pass
-- Breaking changes require migration guide
-- Performance benchmarks required for critical path changes
+**Rationale**: LazySth styling and keyboard-centric design are core to the product identity. Consistency ensures a cohesive user experience for keyboard power users familiar with LazyVim/LazyGit conventions.
 
-### Documentation Standards
-- New features require updated README sections
-- API changes need migration guides
-- Complex logic requires inline documentation
-- CHROME_KEYBOARD_SHORTCUT.md must be referenced for all keyboard work
+### V. Chrome Built-in AI API Standards (NON-NEGOTIABLE)
 
-### Release Process
-- Semantic versioning strictly enforced
-- Changelog updated for every release
-- Chrome Web Store and Firefox Add-ons updates synchronized
-- Breaking changes require major version bump
+**When developing features using Chrome Built-in AI APIs (Summarizer API, Prompt API, Writer API), MUST verify latest API documentation before implementation due to origin trial program status.**
 
-## Architecture Constraints
+Requirements:
+- MUST use Context7 MCP tools to query MDN documentation for Chrome Built-in AI APIs before implementation
+- MUST use Web Search to verify latest API changes, availability methods, and usage patterns
+- MUST verify model availability using asynchronous availability methods:
+  - Summarizer API: `Summarizer.availability()`
+  - Prompt API: `LanguageModel.availability()`
+  - Writer API: `Writer.availability()`
+- MUST handle origin trial token requirements and feature detection
+- MUST implement proper fallback mechanisms when APIs are unavailable
+- MUST document API version and origin trial status in code comments
+- AI agents have outdated information about these APIs - ALWAYS verify current documentation
 
-### Technology Stack (Locked)
-- **Framework**: WXT (no migration without critical justification)
-- **UI Library**: React 19+ with hooks only (no class components)
-- **Language**: TypeScript with strict mode enabled
-- **Build System**: WXT's Vite-based pipeline
-- **State Management**: React hooks and context (no Redux unless proven necessary)
+**Rationale**: Chrome Built-in AI APIs are in origin trial program and subject to frequent changes. AI agents may have outdated information about API signatures, availability methods, and usage patterns. Verifying current documentation prevents implementation errors and ensures compatibility with the latest API versions. These APIs are critical to LazyBookmark's core value proposition (summarization, semantic features) and must be implemented correctly.
 
-### Extension Architecture Rules
-- Background scripts handle all cross-origin requests
-- Content scripts remain minimal and performant
-- Message passing must use typed interfaces
-- React components must be functional with proper hook dependencies
-- CSS modules or styled-components only (no global styles)
+## Development Workflow
+
+### Code Modification Procedure
+
+Every code change MUST follow this workflow:
+
+1. **Implement** changes to code
+2. **Validate** with `npm run compile` (TypeScript type checking)
+3. **Lint** with `npm run lint` (code quality check)
+4. **Fix** all errors and warnings (use `npm run lint:fix` for auto-fixes)
+5. **Test** business logic changes with unit tests in `test/` folder
+6. **Commit** only after all validations pass
+
+### Architecture Requirements
+
+When adding new functionality:
+
+1. **Create** pure TypeScript class/function for business logic
+2. **Test** the pure TypeScript logic with unit tests
+3. **Wrap** the logic in a custom hook for React integration
+4. **Use** the custom hook in React components
+5. **Avoid** putting business logic directly in components
+
+### Testing Requirements
+
+When writing tests:
+
+1. **Target** pure TypeScript business logic only
+2. **Place** tests in `test/` folder
+3. **Use** `@testing-library/react` and Vitest
+4. **Avoid** testing custom hooks or React components with unit tests
+5. **Focus** on behavior and outcomes, not implementation details
+
+### Chrome Built-in AI Development Workflow
+
+When implementing Chrome Built-in AI features(Summarizer API, Prompt API, Writer API, etc.):
+
+1. **Research** current API documentation using Context7 MCP tools (MDN)
+2. **Verify** latest changes using Web Search
+3. **Document** API version and origin trial status in code
+4. **Implement** with proper availability checks
+5. **Add** fallback mechanisms for when APIs are unavailable
+6. **Test** both available and unavailable scenarios
+
+## Quality Gates
+
+Before any pull request or commit, the following MUST be verified:
+
+- [ ] `npm run compile` passes with zero errors
+- [ ] `npm run lint` passes with zero errors/warnings
+- [ ] All unit tests pass (`npm run test`)
+- [ ] Business logic is in pure TypeScript classes/functions
+- [ ] Custom hooks wrap business logic appropriately
+- [ ] React components contain no business logic
+- [ ] LazySth styling consistency maintained
+- [ ] Keyboard shortcuts documented and conflict-free
+- [ ] Chrome Built-in AI APIs verified against current documentation (if applicable)
+- [ ] Availability checks implemented for all AI APIs used
+- [ ] Fallback mechanisms tested for unavailable AI features
 
 ## Governance
 
-The Constitution supersedes all development practices and team agreements.
+### Amendment Procedure
 
-### Amendment Process
-1. Proposed changes require written justification with impact analysis
-2. Breaking principle changes require team consensus
-3. Version bump follows semantic versioning:
-   - MAJOR: Principle removal or incompatible redefinition
-   - MINOR: New principle or section addition
-   - PATCH: Clarification or wording improvements
-4. All amended versions must update dependent templates
+This constitution may be amended through the following process:
 
-### Compliance Verification
-- All PRs must reference constitution compliance in description
-- Automated CI checks enforce linting and compilation rules
-- Performance benchmarks run on every merge to main
-- Quarterly constitution review to ensure relevance
+1. Proposed changes MUST be documented with rationale
+2. Changes MUST be reviewed against existing codebase
+3. Version MUST be incremented following semantic versioning:
+   - **MAJOR**: Backward-incompatible governance/principle removals or redefinitions
+   - **MINOR**: New principle/section added or materially expanded guidance
+   - **PATCH**: Clarifications, wording, typo fixes, non-semantic refinements
+4. All dependent templates MUST be updated for consistency
+5. A Sync Impact Report MUST be generated documenting changes
 
-### Runtime Guidance
-Development teams should reference CLAUDE.md for AI-assisted development patterns and README.md for general project guidance. The constitution principles must be considered in all architectural decisions.
+### Compliance
 
-**Version**: 1.0.0 | **Ratified**: TODO(RATIFICATION_DATE): Pending user confirmation | **Last Amended**: 2025-01-02
+- All pull requests MUST verify compliance with these principles
+- Code reviews MUST enforce architectural separation (pure logic → hook → component)
+- Complexity MUST be justified against simplicity principle
+- Violations require explicit justification and approval
+- Template files (`plan-template.md`, `spec-template.md`, `tasks-template.md`) MUST reference this constitution
+
+### Living Document
+
+This constitution is a living document that evolves with the project. Updates MUST:
+
+- Maintain backward compatibility where possible
+- Document breaking changes clearly
+- Update all dependent artifacts synchronously
+- Preserve the core principles (I-V) unless critical justification provided
+
+**Version**: 1.1.0 | **Ratified**: 2025-10-18 | **Last Amended**: 2025-10-18

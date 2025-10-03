@@ -64,20 +64,13 @@ function extractCleanTextWithReadability(html: string): string {
 export type SummarizerStatus =
   | 'idle'
   | 'checking'
-  | 'available'
-  | 'downloadable'
-  | 'downloading'
-  | 'unavailable'
+  | Availability
   | 'summarizing'
   | 'completed'
   | 'error';
 
-export interface UseSummarizerOptions {
+export interface UseSummarizerOptions extends SummarizerCreateCoreOptions {
   enabled?: boolean;
-  type?: 'key-points' | 'tldr' | 'teaser' | 'headline';
-  format?: 'markdown' | 'plain-text';
-  length?: 'short' | 'medium' | 'long';
-  outputLanguage?: 'en' | 'es' | 'ja';
 }
 
 export interface UseSummarizerResult {
@@ -105,7 +98,7 @@ export const useSummarizer = (
   const [summary, setSummary] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [downloadProgress, setDownloadProgress] = useState<number>(0);
-  const [summarizer, setSummarizer] = useState<SummarizerInstance | null>(null);
+  const [summarizer, setSummarizer] = useState<Summarizer | null>(null);
 
   const checkAvailability = useCallback(async () => {
     if (!enabled) {
@@ -181,13 +174,10 @@ export const useSummarizer = (
         length,
         outputLanguage,
         monitor: (monitor) => {
-          monitor.addEventListener(
-            'downloadprogress',
-            (e: DownloadProgressEvent) => {
-              const progress = Math.round((e.loaded || 0) * 100);
-              setDownloadProgress(progress);
-            }
-          );
+          monitor.addEventListener('downloadprogress', (e: ProgressEvent) => {
+            const progress = Math.round((e.loaded || 0) * 100);
+            setDownloadProgress(progress);
+          });
         },
       });
 
@@ -215,35 +205,34 @@ export const useSummarizer = (
     );
   }, []);
 
-  const ensureSummarizer =
-    useCallback(async (): Promise<SummarizerInstance | null> => {
-      if (summarizer) {
-        return summarizer;
-      }
+  const ensureSummarizer = useCallback(async (): Promise<Summarizer | null> => {
+    if (summarizer) {
+      return summarizer;
+    }
 
-      if (status === 'available') {
-        try {
-          const newSummarizer = await Summarizer.create({
-            type,
-            format,
-            length,
-            outputLanguage,
-          });
-          setSummarizer(newSummarizer);
-          setStatus('available');
-          return newSummarizer;
-        } catch (err) {
-          console.error('Error creating summarizer:', err);
-          setStatus('error');
-          setError(
-            `Failed to create summarizer: ${err instanceof Error ? err.message : 'Unknown error'}`
-          );
-          return null;
-        }
+    if (status === 'available') {
+      try {
+        const newSummarizer = await Summarizer.create({
+          type,
+          format,
+          length,
+          outputLanguage,
+        });
+        setSummarizer(newSummarizer);
+        setStatus('available');
+        return newSummarizer;
+      } catch (err) {
+        console.error('Error creating summarizer:', err);
+        setStatus('error');
+        setError(
+          `Failed to create summarizer: ${err instanceof Error ? err.message : 'Unknown error'}`
+        );
+        return null;
       }
+    }
 
-      return null;
-    }, [summarizer, status, type, format, length, outputLanguage]);
+    return null;
+  }, [summarizer, status, type, format, length, outputLanguage]);
 
   const summarize = useCallback(
     async (text: string) => {
