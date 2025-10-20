@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { ReadingTimeCalculator } from '../entrypoints/content/telescope/models/ReadingTimeCalculator';
-import { countWords } from '../entrypoints/content/telescope/models/wordCounter';
+import { countWords } from '../entrypoints/content/telescope/models/WordCounter';
 
 describe('countWords', () => {
   it('should count words in plain text', () => {
