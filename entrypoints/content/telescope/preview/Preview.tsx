@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useSummarizer } from '../hooks/useSummarizer';
+import { useReadingTime } from '../hooks/useReadingTime';
 
 interface PreviewProps {
   previewContent: string;
@@ -28,6 +29,7 @@ const Preview: React.FC<PreviewProps> = ({
     enabled: activeTab === 'summarize' && !isLoading,
   });
 
+  const readingTime = useReadingTime(previewContent);
   const prevContentRef = useRef<string>('');
 
   // Handle keyboard input for consent
@@ -167,6 +169,9 @@ const Preview: React.FC<PreviewProps> = ({
               <div className="telescope-ai-status">
                 <span className="telescope-status-indicator ready">●</span>
                 AI Summary
+                {readingTime && (
+                  <span className="telescope-reading-time"> · {readingTime}</span>
+                )}
               </div>
               <div className="telescope-summary-content">
                 {summary || 'No summary available'}
