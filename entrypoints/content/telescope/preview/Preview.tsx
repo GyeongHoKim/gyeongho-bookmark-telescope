@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useSummarizer } from '../hooks/useSummarizer';
 
 interface PreviewProps {
@@ -28,8 +28,7 @@ const Preview: React.FC<PreviewProps> = ({
     enabled: activeTab === 'summarize' && !isLoading,
   });
 
-
-
+  const prevContentRef = useRef<string>('');
 
   // Handle keyboard input for consent
   const handleKeyDown = useCallback(
@@ -49,19 +48,23 @@ const Preview: React.FC<PreviewProps> = ({
     [isFocused, activeTab, status, acceptDownload, declineDownload]
   );
 
-  // Trigger summarization when tab becomes active and status is available
   useEffect(() => {
-    if (activeTab === 'summarize' && previewContent && !isLoading && status === 'available') {
+    if (
+      activeTab === 'summarize' &&
+      previewContent &&
+      status === 'available' &&
+      previewContent !== prevContentRef.current
+    ) {
+      prevContentRef.current = previewContent;
       summarize(previewContent);
     }
-  }, [activeTab, previewContent, isLoading, status, summarize]);
+  }, [activeTab, previewContent, status, summarize]);
 
   // Add keyboard event listener
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
-
 
   const renderTabContent = () => {
     if (isLoading) {
@@ -121,7 +124,8 @@ const Preview: React.FC<PreviewProps> = ({
                   <span className="telescope-key-hint">[Y]</span> Download and
                   use AI summarization
                   <br />
-                  <span className="telescope-key-hint">[N]</span> Decline (AI summarization will not be available)
+                  <span className="telescope-key-hint">[N]</span> Decline (AI
+                  summarization will not be available)
                 </div>
               </div>
             </div>
@@ -170,19 +174,6 @@ const Preview: React.FC<PreviewProps> = ({
             </div>
           );
 
-        case 'completed':
-          return (
-            <div className="telescope-preview-summary">
-              <div className="telescope-ai-status">
-                <span className="telescope-status-indicator ready">●</span>
-                AI Summary
-              </div>
-              <div className="telescope-summary-content">
-                {summary || 'No summary available'}
-              </div>
-            </div>
-          );
-
         case 'error':
           return (
             <div className="telescope-preview-summary">
@@ -193,7 +184,6 @@ const Preview: React.FC<PreviewProps> = ({
               <div className="telescope-ai-error">{error}</div>
             </div>
           );
-
 
         default:
           return (

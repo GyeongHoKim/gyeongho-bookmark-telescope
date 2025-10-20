@@ -10,40 +10,20 @@ function extractCleanTextWithReadability(html: string): string {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
 
-    const reader = new Readability(doc, {
-      debug: false,
-      maxElemsToParse: 1000,
-      nbTopCandidates: 5,
-      charThreshold: 500,
-      classesToPreserve: ['caption', 'emoji', 'hidden'],
-      keepClasses: false,
-      disableJSONLD: true,
-    });
-
+    const reader = new Readability(doc);
     const article = reader.parse();
 
     if (article && article.textContent) {
       let text = article.textContent;
-
       text = text.replace(/[\s\r\n\t]+/g, ' ');
       text = text.replace(/\s+([,.!?;:])/g, '$1');
       text = text.replace(/([,.!?;:])\s+/g, '$1 ');
       text = text.trim();
-
-      if (text.length > 5000) {
-        const sentences = text.substring(0, 5000).split(/[.!?]+/);
-        sentences.pop();
-        text = sentences.join('. ');
-        if (text && !text.match(/[.!?]$/)) {
-          text += '.';
-        }
-      }
-
       return text;
     }
 
-    const title = doc.querySelector('title')?.textContent || '';
-    if (title.trim()) {
+    const title = article?.title ?? article?.siteName ?? document.title ?? '';
+    if (title) {
       return title.trim();
     }
 
@@ -66,7 +46,6 @@ export type SummarizerStatus =
   | 'checking'
   | Availability
   | 'summarizing'
-  | 'completed'
   | 'error';
 
 export interface UseSummarizerOptions extends SummarizerCreateCoreOptions {
@@ -277,12 +256,6 @@ export const useSummarizer = (
         );
       }
 
-      if (status === 'completed') {
-        throw new Error(
-          'Summary already completed. Refresh content to generate a new summary.'
-        );
-      }
-
       if (status !== 'available') {
         throw new Error(`Invalid summarizer state: ${status}`);
       }
@@ -302,7 +275,7 @@ export const useSummarizer = (
         });
 
         setSummary(result);
-        setStatus('completed');
+        setStatus('available');
       } catch (err) {
         console.error('Error generating AI summary:', err);
         setStatus('error');
