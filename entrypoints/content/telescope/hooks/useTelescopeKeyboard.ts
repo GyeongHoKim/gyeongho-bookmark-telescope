@@ -73,14 +73,12 @@ export const useTelescopeKeyboard = ({
             }
             break;
           case '[':
-          case 'BracketLeft':
             if (previewFocused) {
               e.preventDefault();
               send({ type: 'PREV_PREVIEW_TAB' });
             }
             break;
           case ']':
-          case 'BracketRight':
             if (previewFocused) {
               e.preventDefault();
               send({ type: 'NEXT_PREVIEW_TAB' });
