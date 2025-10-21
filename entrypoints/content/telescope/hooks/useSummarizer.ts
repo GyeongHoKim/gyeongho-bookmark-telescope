@@ -154,7 +154,7 @@ export const useSummarizer = (
         outputLanguage,
         monitor: (monitor) => {
           monitor.addEventListener('downloadprogress', (e: ProgressEvent) => {
-            const progress = Math.round((e.loaded || 0) * 100);
+            const progress = Math.round((e.loaded / e.total) * 100);
             setDownloadProgress(progress);
           });
         },
