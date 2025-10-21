@@ -54,10 +54,11 @@ export class ReadingTimeCalculator {
     const remainingMinutes = Math.round(minutes % 60);
 
     if (remainingMinutes === 0) {
-      return `${hours} hour read`;
+      const hourText = hours === 1 ? 'hour' : 'hours';
+      return `${hours} ${hourText} read`;
     }
-
-    return `${hours} hour ${remainingMinutes} min read`;
+    const hourText = hours === 1 ? 'hour' : 'hours';
+    return `${hours} ${hourText} ${remainingMinutes} min read`;
   }
 
   /**
