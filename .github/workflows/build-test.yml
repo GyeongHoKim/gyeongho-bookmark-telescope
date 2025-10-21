@@ -20,5 +20,4 @@ jobs:
       - name: Zip extension
         run: npm run zip
       - name: Check zip file exists
-        run: test -f .output/bookmark-telescope-chrome.zip
-
+        run: test -f .output/lazy-bookmark-chrome.zip
