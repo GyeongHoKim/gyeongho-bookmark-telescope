@@ -1,5 +1,6 @@
-import { Readability } from '@mozilla/readability';
+import { isProbablyReaderable, Readability } from '@mozilla/readability';
 import { useCallback, useEffect, useState } from 'react';
+import { extractDocumentMetadata } from '../models/DocumentMetadataExtractor';
 
 /**
  * Extract clean text from HTML using Mozilla's Readability.js
@@ -9,6 +10,10 @@ function extractCleanTextWithReadability(html: string): string {
   try {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
+
+    if (!isProbablyReaderable(doc)) {
+      return extractDocumentMetadata(doc);
+    }
 
     const reader = new Readability(doc);
     const article = reader.parse();
@@ -22,14 +27,21 @@ function extractCleanTextWithReadability(html: string): string {
       return text;
     }
 
-    const title = article?.title ?? article?.siteName ?? document.title ?? '';
-    if (title) {
-      return title.trim();
-    }
-
-    throw new Error('Readability could not extract content');
+    return extractDocumentMetadata(doc);
   } catch (error) {
     console.warn('Readability extraction failed, using fallback:', error);
+
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const metadata = extractDocumentMetadata(doc);
+
+      if (metadata.trim()) {
+        return metadata;
+      }
+    } catch (parseError) {
+      console.warn('Metadata extraction also failed:', parseError);
+    }
 
     return html
       .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
