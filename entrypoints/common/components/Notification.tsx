@@ -17,9 +17,8 @@ const Notification: React.FC<NotificationProps> = ({
   title,
   message,
   duration = 3000,
-  onClose
+  onClose,
 }) => {
-
   useEffect(() => {
     if (duration > 0) {
       const timer = setTimeout(() => {

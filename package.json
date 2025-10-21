@@ -40,6 +40,7 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "format": "prettier --write \"entrypoints/**/*.{ts,tsx}\"",
     "postinstall": "wxt prepare"
   },
   "dependencies": {

@@ -12,19 +12,18 @@ export const LEADER_ITEMS: LeaderItem[] = [
     id: 'live-grep',
     label: 'Live Grep',
     description: 'Search bookmarks',
-    hotkeys: ['g']
+    hotkeys: ['g'],
   },
   {
     id: 'quick-bookmark',
     label: 'Quick Bookmark',
     description: 'Quick add current page',
-    hotkeys: ['a']
+    hotkeys: ['a'],
   },
   {
     id: 'bookmark-manager',
     label: 'Bookmark Manager',
     description: 'Full bookmark management',
-    hotkeys: ['b']
-  }
+    hotkeys: ['b'],
+  },
 ];
-

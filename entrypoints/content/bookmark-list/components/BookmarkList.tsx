@@ -45,7 +45,9 @@ const BookmarkList: React.FC<BookmarkListProps> = ({
   const selectedCount = totalCount > 0 ? selectedIndex + 1 : 0;
 
   return (
-    <div className={`telescope-section telescope-results-section ${isFocused ? 'focused' : ''}`}>
+    <div
+      className={`telescope-section telescope-results-section ${isFocused ? 'focused' : ''}`}
+    >
       <div className="telescope-section-header">
         <span className="telescope-section-label">Results</span>
         <span className="telescope-section-counter">
