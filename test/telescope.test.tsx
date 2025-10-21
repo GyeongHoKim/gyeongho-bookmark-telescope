@@ -201,12 +201,12 @@ describe('BookmarkTelescope integration', () => {
     expect(htmlTab()).not.toHaveClass('active');
 
     // ] switches to [HTML]
-    await user.keyboard('{BracketRight}');
+    await user.keyboard('{]}');
     await waitFor(() => expect(htmlTab()).toHaveClass('active'));
     await waitFor(() => expect(summarizeTab()).not.toHaveClass('active'));
 
     // [ switches back to [Summarize]
-    await user.keyboard('{BracketLeft}');
+    await user.keyboard('{[}');
     await waitFor(() => expect(summarizeTab()).toHaveClass('active'));
     await waitFor(() => expect(htmlTab()).not.toHaveClass('active'));
   });

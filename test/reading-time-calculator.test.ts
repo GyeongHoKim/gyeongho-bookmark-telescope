@@ -99,9 +99,9 @@ describe('ReadingTimeCalculator', () => {
       expect(ReadingTimeCalculator.formatReadingTime(90)).toBe(
         '1 hour 30 min read'
       );
-      expect(ReadingTimeCalculator.formatReadingTime(120)).toBe('2 hour read');
+      expect(ReadingTimeCalculator.formatReadingTime(120)).toBe('2 hours read');
       expect(ReadingTimeCalculator.formatReadingTime(150)).toBe(
-        '2 hour 30 min read'
+        '2 hours 30 min read'
       );
     });
 
