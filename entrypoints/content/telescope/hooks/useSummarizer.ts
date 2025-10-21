@@ -1,5 +1,6 @@
 import { isProbablyReaderable, Readability } from '@mozilla/readability';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { debounce } from '../../../common/utils/debounce';
 import { extractDocumentMetadata } from '../models/DocumentMetadataExtractor';
 
 /**
@@ -69,7 +70,7 @@ export interface UseSummarizerResult {
   summary: string;
   error: string;
   downloadProgress: number;
-  summarize: (text: string) => Promise<void>;
+  summarize: ((text: string) => void) & { cancel: () => void };
   acceptDownload: () => Promise<void>;
   declineDownload: () => void;
 }
@@ -244,7 +245,7 @@ export const useSummarizer = (
     return null;
   }, [summarizer, status, type, format, length, outputLanguage]);
 
-  const summarize = useCallback(
+  const summarizeImmediate = useCallback(
     async (text: string) => {
       if (!text || !text.trim()) {
         setSummary('');
@@ -318,6 +319,11 @@ export const useSummarizer = (
     [status, ensureSummarizer]
   );
 
+  const summarize = useMemo(
+    () => debounce(summarizeImmediate, 300),
+    [summarizeImmediate]
+  );
+
   // Initialize on mount
   useEffect(() => {
     if (enabled && status === 'idle') {
@@ -334,6 +340,13 @@ export const useSummarizer = (
       }
     };
   }, []);
+
+  // Cleanup debounce on unmount
+  useEffect(() => {
+    return () => {
+      summarize.cancel();
+    };
+  }, [summarize]);
 
   // Cleanup summarizer on unmount
   useEffect(() => {
