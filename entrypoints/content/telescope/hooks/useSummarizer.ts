@@ -1,5 +1,5 @@
 import { isProbablyReaderable, Readability } from '@mozilla/readability';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { extractDocumentMetadata } from '../models/DocumentMetadataExtractor';
 
 /**
@@ -90,6 +90,7 @@ export const useSummarizer = (
   const [error, setError] = useState<string>('');
   const [downloadProgress, setDownloadProgress] = useState<number>(0);
   const [summarizer, setSummarizer] = useState<Summarizer | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const checkAvailability = useCallback(async () => {
     if (!enabled) {
@@ -119,22 +120,40 @@ export const useSummarizer = (
           break;
         case 'downloading': {
           setStatus('downloading');
+
+          // Clear any existing interval before creating a new one
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+          }
+
           const checkInterval = setInterval(async () => {
             try {
               const newAvailability = await Summarizer.availability();
               if (newAvailability === 'available') {
-                clearInterval(checkInterval);
+                if (intervalRef.current) {
+                  clearInterval(intervalRef.current);
+                  intervalRef.current = null;
+                }
                 setStatus('available');
                 setDownloadProgress(0);
               } else if (newAvailability !== 'downloading') {
-                clearInterval(checkInterval);
+                if (intervalRef.current) {
+                  clearInterval(intervalRef.current);
+                  intervalRef.current = null;
+                }
                 checkAvailability();
               }
             } catch (err) {
-              clearInterval(checkInterval);
+              if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
+              }
               console.error('Error checking download status:', err);
             }
           }, 1000);
+
+          // Store interval ID in ref for cleanup on unmount
+          intervalRef.current = checkInterval;
           break;
         }
         case 'unavailable':
@@ -306,7 +325,17 @@ export const useSummarizer = (
     }
   }, [enabled, status, checkAvailability]);
 
-  // Cleanup on unmount
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, []);
+
+  // Cleanup summarizer on unmount
   useEffect(() => {
     return () => {
       if (summarizer) {
