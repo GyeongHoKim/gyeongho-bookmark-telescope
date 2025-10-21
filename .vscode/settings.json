@@ -56,7 +56,8 @@
     "**/stats-*.json": true
   },
   "files.exclude": {
-    "**/node_modules": true
+    "**/node_modules": true,
+    "package-lock.json": true
   },
   "wxt.autoReload": true
 }
