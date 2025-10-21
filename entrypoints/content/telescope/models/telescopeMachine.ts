@@ -73,7 +73,10 @@ export const telescopeMachine = createMachine({
               actions: assign({
                 selectedBookmarkIndex: ({ context }) => {
                   if (context.filteredBookmarks.length === 0) return 0;
-                  return (context.selectedBookmarkIndex + 1) % context.filteredBookmarks.length;
+                  return (
+                    (context.selectedBookmarkIndex + 1) %
+                    context.filteredBookmarks.length
+                  );
                 },
               }),
             },
@@ -81,7 +84,12 @@ export const telescopeMachine = createMachine({
               actions: assign({
                 selectedBookmarkIndex: ({ context }) => {
                   if (context.filteredBookmarks.length === 0) return 0;
-                  return (context.selectedBookmarkIndex - 1 + context.filteredBookmarks.length) % context.filteredBookmarks.length;
+                  return (
+                    (context.selectedBookmarkIndex -
+                      1 +
+                      context.filteredBookmarks.length) %
+                    context.filteredBookmarks.length
+                  );
                 },
               }),
             },
@@ -109,12 +117,14 @@ export const telescopeMachine = createMachine({
             PREV_PANEL: { target: '#normal_liveGrep' },
             NEXT_PREVIEW_TAB: {
               actions: assign({
-                previewTab: ({ context }) => (context.previewTab === 'html' ? 'summarize' : 'html'),
+                previewTab: ({ context }) =>
+                  context.previewTab === 'html' ? 'summarize' : 'html',
               }),
             },
             PREV_PREVIEW_TAB: {
               actions: assign({
-                previewTab: ({ context }) => (context.previewTab === 'html' ? 'summarize' : 'html'),
+                previewTab: ({ context }) =>
+                  context.previewTab === 'html' ? 'summarize' : 'html',
               }),
             },
           },
@@ -122,9 +132,18 @@ export const telescopeMachine = createMachine({
       },
       on: {
         FOCUS_PANEL: [
-          { guard: ({ event }) => event.panel === 'bookmarkList', target: '.bookmarkList' },
-          { guard: ({ event }) => event.panel === 'liveGrep', target: '.liveGrep' },
-          { guard: ({ event }) => event.panel === 'preview', target: '.preview' },
+          {
+            guard: ({ event }) => event.panel === 'bookmarkList',
+            target: '.bookmarkList',
+          },
+          {
+            guard: ({ event }) => event.panel === 'liveGrep',
+            target: '.liveGrep',
+          },
+          {
+            guard: ({ event }) => event.panel === 'preview',
+            target: '.preview',
+          },
         ],
       },
     },

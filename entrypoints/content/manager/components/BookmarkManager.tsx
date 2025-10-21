@@ -3,9 +3,17 @@ import { useBookmarkManager } from '../hooks/useBookmarkManager';
 
 const BookmarkManager: React.FC = () => {
   const {
-    isVisible, overlayRef, handleOverlayClick,
-    flattenedTree, selectedIndex, inputValue, editingNodeId, isLoading,
-    setInputValue, handleItemClick, mode,
+    isVisible,
+    overlayRef,
+    handleOverlayClick,
+    flattenedTree,
+    selectedIndex,
+    inputValue,
+    editingNodeId,
+    isLoading,
+    setInputValue,
+    handleItemClick,
+    mode,
   } = useBookmarkManager();
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -21,9 +29,12 @@ const BookmarkManager: React.FC = () => {
     return prefix;
   }, []);
 
-  const getNodeIcon = useCallback((node: { hasChildren?: boolean; isExpanded?: boolean }) => {
-    return node.hasChildren ? (node.isExpanded ? '▼ ' : '▶ ') : '  ';
-  }, []);
+  const getNodeIcon = useCallback(
+    (node: { hasChildren?: boolean; isExpanded?: boolean }) => {
+      return node.hasChildren ? (node.isExpanded ? '▼ ' : '▶ ') : '  ';
+    },
+    []
+  );
 
   useEffect(() => {
     if (itemRefs.current[selectedIndex]) {
@@ -65,7 +76,9 @@ const BookmarkManager: React.FC = () => {
             flattenedTree.map((node, index) => (
               <div key={node.id}>
                 <div
-                  ref={(el) => { itemRefs.current[index] = el; }}
+                  ref={(el) => {
+                    itemRefs.current[index] = el;
+                  }}
                   className={`bookmark-manager-item ${index === selectedIndex ? 'selected' : ''}`}
                   style={{ paddingLeft: '10px' }}
                   onClick={() => handleItemClick(index)}
@@ -95,33 +108,52 @@ const BookmarkManager: React.FC = () => {
                       <span className="bookmark-manager-icon">
                         {getNodeIcon(node)}
                       </span>
-                      <span className="bookmark-manager-label">{node.title || 'Untitled'}</span>
+                      <span className="bookmark-manager-label">
+                        {node.title || 'Untitled'}
+                      </span>
                       {node.hasChildren && (
-                        <span className="bookmark-manager-count">[{node.children?.length || 0}]</span>
+                        <span className="bookmark-manager-count">
+                          [{node.children?.length || 0}]
+                        </span>
                       )}
                     </div>
                   )}
                 </div>
 
-                {(mode === 'add-bookmark' || mode === 'add-folder') && index === selectedIndex && (
-                  <div className="bookmark-manager-item bookmark-manager-new-item" style={{ paddingLeft: '10px' }}>
-                    <div className="bookmark-manager-item-content">
-                      <span className="bookmark-manager-tree-prefix">
-                        {getTreePrefix([...(node.isLast || []), true], node.hasChildren ? (node.level || 0) + 1 : (node.level || 0))}
-                      </span>
-                      <span className="bookmark-manager-icon">{mode === 'add-folder' ? '▶ ' : '  '}</span>
-                      <input
-                        ref={inputRef}
-                        type="text"
-                        className="bookmark-manager-input"
-                        placeholder={mode === 'add-folder' ? 'Folder name...' : 'Bookmark name...'}
-                        value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        autoFocus
-                      />
+                {(mode === 'add-bookmark' || mode === 'add-folder') &&
+                  index === selectedIndex && (
+                    <div
+                      className="bookmark-manager-item bookmark-manager-new-item"
+                      style={{ paddingLeft: '10px' }}
+                    >
+                      <div className="bookmark-manager-item-content">
+                        <span className="bookmark-manager-tree-prefix">
+                          {getTreePrefix(
+                            [...(node.isLast || []), true],
+                            node.hasChildren
+                              ? (node.level || 0) + 1
+                              : node.level || 0
+                          )}
+                        </span>
+                        <span className="bookmark-manager-icon">
+                          {mode === 'add-folder' ? '▶ ' : '  '}
+                        </span>
+                        <input
+                          ref={inputRef}
+                          type="text"
+                          className="bookmark-manager-input"
+                          placeholder={
+                            mode === 'add-folder'
+                              ? 'Folder name...'
+                              : 'Bookmark name...'
+                          }
+                          value={inputValue}
+                          onChange={(e) => setInputValue(e.target.value)}
+                          autoFocus
+                        />
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
               </div>
             ))
           )}
@@ -129,11 +161,20 @@ const BookmarkManager: React.FC = () => {
 
         <div className="bookmark-manager-footer">
           {mode === 'confirm-delete' ? (
-            <span className="bookmark-manager-help">Delete &quot;{selectedNode?.title}&quot;? [y/n]</span>
-          ) : mode === 'edit' || mode === 'add-bookmark' || mode === 'add-folder' ? (
-            <span className="bookmark-manager-help">[Enter: save] [ESC: cancel]</span>
+            <span className="bookmark-manager-help">
+              Delete &quot;{selectedNode?.title}&quot;? [y/n]
+            </span>
+          ) : mode === 'edit' ||
+            mode === 'add-bookmark' ||
+            mode === 'add-folder' ? (
+            <span className="bookmark-manager-help">
+              [Enter: save] [ESC: cancel]
+            </span>
           ) : (
-            <span className="bookmark-manager-help">[j/k: ↑↓] [h/l: ←→] [a: add] [A: folder] [r: rename] [d: delete] [o: open]</span>
+            <span className="bookmark-manager-help">
+              [j/k: ↑↓] [h/l: ←→] [a: add] [A: folder] [r: rename] [d: delete]
+              [o: open]
+            </span>
           )}
         </div>
       </div>

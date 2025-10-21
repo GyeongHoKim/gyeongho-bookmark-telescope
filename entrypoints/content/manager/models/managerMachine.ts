@@ -62,7 +62,7 @@ export const managerMachine = createMachine({
           actions: assign(({ context }) => ({
             selectedIndex: Math.min(
               context.selectedIndex + 1,
-              Math.max(0, context.flattenedTree.length - 1),
+              Math.max(0, context.flattenedTree.length - 1)
             ),
           })),
         },

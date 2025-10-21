@@ -1,4 +1,9 @@
-import React, { createContext, useContext, useReducer, useCallback } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  useCallback,
+} from 'react';
 import type { NotificationType } from '../components/Notification';
 
 export interface NotificationData {
@@ -35,7 +40,7 @@ interface NotificationContextType {
 const NotificationContext = createContext<NotificationContextType | null>(null);
 
 const initialState: NotificationState = {
-  notifications: []
+  notifications: [],
 };
 
 function notificationReducer(
@@ -46,26 +51,28 @@ function notificationReducer(
     case 'ADD_NOTIFICATION':
       return {
         ...state,
-        notifications: [...state.notifications, action.payload]
+        notifications: [...state.notifications, action.payload],
       };
     case 'REMOVE_NOTIFICATION':
       return {
         ...state,
         notifications: state.notifications.filter(
-          notification => notification.id !== action.payload.id
-        )
+          (notification) => notification.id !== action.payload.id
+        ),
       };
     case 'CLEAR_ALL_NOTIFICATIONS':
       return {
         ...state,
-        notifications: []
+        notifications: [],
       };
     default:
       return state;
   }
 }
 
-export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [state, dispatch] = useReducer(notificationReducer, initialState);
 
   const notify = useCallback((options: NotificationOptions) => {
@@ -77,8 +84,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         type: options.variant,
         title: options.title,
         message: options.message,
-        duration: options.duration
-      }
+        duration: options.duration,
+      },
     });
     return id;
   }, []);
@@ -86,7 +93,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const removeNotification = useCallback((id: string) => {
     dispatch({
       type: 'REMOVE_NOTIFICATION',
-      payload: { id }
+      payload: { id },
     });
   }, []);
 
@@ -98,7 +105,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     notifications: state.notifications,
     notify,
     removeNotification,
-    clearAllNotifications
+    clearAllNotifications,
   };
 
   return (
@@ -111,7 +118,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 export function useNotification() {
   const context = useContext(NotificationContext);
   if (!context) {
-    throw new Error('useNotification must be used within a NotificationProvider');
+    throw new Error(
+      'useNotification must be used within a NotificationProvider'
+    );
   }
   return context;
 }

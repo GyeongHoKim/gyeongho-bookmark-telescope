@@ -50,15 +50,26 @@ const BookmarkList: React.FC<BookmarkListProps> = ({
     >
       <div className="telescope-section-header">
         <span className="telescope-section-label">Results</span>
-        <span className="telescope-section-counter" role="status" aria-live="polite" aria-label="Results count">
+        <span
+          className="telescope-section-counter"
+          role="status"
+          aria-live="polite"
+          aria-label="Results count"
+        >
           {totalCount > 0 ? `${selectedCount} / ${totalCount}` : '0 / 0'}
         </span>
       </div>
       <div className="telescope-results" ref={containerRef}>
         {bookmarks.length === 0 ? (
-          <div className="telescope-loading" role="status" aria-live="polite">No bookmarks found</div>
+          <div className="telescope-loading" role="status" aria-live="polite">
+            No bookmarks found
+          </div>
         ) : (
-          <ul className="telescope-results-list" role="listbox" aria-label="Bookmark results">
+          <ul
+            className="telescope-results-list"
+            role="listbox"
+            aria-label="Bookmark results"
+          >
             {bookmarks.map((bookmark, index) => (
               <li
                 key={bookmark.id}

@@ -170,7 +170,10 @@ const Preview: React.FC<PreviewProps> = ({
                 <span className="telescope-status-indicator ready">●</span>
                 AI Summary
                 {readingTime && (
-                  <span className="telescope-reading-time"> · {readingTime}</span>
+                  <span className="telescope-reading-time">
+                    {' '}
+                    · {readingTime}
+                  </span>
                 )}
               </div>
               <div className="telescope-summary-content">

@@ -8,11 +8,13 @@ interface UseBookmarkLoaderProps {
 
 export const useBookmarkLoader = ({
   setBookmarks,
-  setFilteredBookmarks
+  setFilteredBookmarks,
 }: UseBookmarkLoaderProps) => {
   const loadBookmarks = useCallback(async () => {
     try {
-      const response = await browser.runtime.sendMessage({ action: 'get-bookmarks' });
+      const response = await browser.runtime.sendMessage({
+        action: 'get-bookmarks',
+      });
       if (response?.error) {
         console.error('Content: Error loading bookmarks:', response.error);
       }

@@ -5,7 +5,10 @@ interface UseTelescopeVisibilityProps {
   onHide: () => void;
 }
 
-export const useTelescopeVisibility = ({ onShow, onHide }: UseTelescopeVisibilityProps) => {
+export const useTelescopeVisibility = ({
+  onShow,
+  onHide,
+}: UseTelescopeVisibilityProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const isVisibleRef = useRef<boolean>(false);
 

@@ -34,7 +34,8 @@ export const useTelescopeKeyboard = ({
       const insert = current.matches('insert');
       const bookmarkListFocused = current.matches('normal.bookmarkList');
       const liveGrepFocused =
-        current.matches('normal.liveGrep') || current.matches('insert.liveGrep');
+        current.matches('normal.liveGrep') ||
+        current.matches('insert.liveGrep');
       const previewFocused = current.matches('normal.preview');
 
       // Normal mode keys
