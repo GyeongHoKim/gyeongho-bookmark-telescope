@@ -32,6 +32,29 @@ A Chrome extension that provides nvim-telescope like interface for searching(liv
 - **LazySth UI/UX**: Dark theme with familiar LazySth-like interface, keyboard power user friendly with keyboard-centric navigation
 - **AI features**: Preview pane showing bookmark summaries using Chrome Built-in AI
 
+## AI Features
+
+### Summarization
+
+At first, the preview pane will show a message to download the LLM model(Gemini Nano). Press `Y` to download and use AI summarization
+
+![Model Download](assets/model_download.png)
+
+After download complete, you can use AI summarization in the preview pane like this:
+
+![AI Summarization](assets/summary_example.png)
+
+## Keyboard Shortcuts
+
+- `Ctrl+Shift+L` / `Cmd+Shift+L`: Open leader palette
+- `g`: Search bookmarks (after opening leader palette)
+- `a`: Quick add current page as bookmark in Leader palette (after opening leader palette)
+- `b`: Open the bookmark manager(after opening leader palette, tree view of bookmarks with add, edit, delete actions)
+- `j` / `k`: Navigate through results(up/down)
+- `h` / `l`: Navigate through results(left/right)
+- `Enter`: Select
+- `q`: Close
+
 ### Basic Features
 
 - [x] Add bookmark keyboard shortcut ([#12](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/12))
@@ -53,32 +76,12 @@ A Chrome extension that provides nvim-telescope like interface for searching(liv
 - [ ] Hybrid AI Sync ([#10](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/10))
 - [ ] Analytics Dashboard ([#11](https://github.com/GyeongHoKim/gyeongho-bookmark-telescope/issues/11))
 
-## Installation
+## Installation for Development
 
 1. Open Chrome and navigate to `chrome://extensions/`
 2. Enable "Developer mode" in the top right
 3. Click "Load unpacked" and select this directory
 4. The extension will be installed and ready to use
-
-## Usage
-
-1. **Open Telescope**: Press `Ctrl+Shift+L` (Windows/Linux) or `Cmd+Shift+L` (Mac) to open leader palette, then press `g`
-2. **Search**: Type in the search box to filter bookmarks by title or URL
-3. **Navigate**: Use ↑↓ arrow keys to navigate through results
-4. **Preview**: Selected bookmark's page content will be shown in the preview pane
-5. **Open**: Press Enter or double-click to open the selected bookmark in a new tab
-6. **Close**: Press Escape or click outside the overlay to close
-
-## Keyboard Shortcuts
-
-- `Ctrl+Shift+L` / `Cmd+Shift+L`: Open leader palette
-- `g`: Search bookmarks (after opening leader palette)
-- `a`: Quick add current page as bookmark in Leader palette (after opening leader palette)
-- `b`: Open the bookmark manager(after opening leader palette, tree view of bookmarks with add, edit, delete actions)
-- `j` / `k`: Navigate through results(up/down)
-- `h` / `l`: Navigate through results(left/right)
-- `Enter`: Select
-- `q`: Close
 
 ## Privacy
 
