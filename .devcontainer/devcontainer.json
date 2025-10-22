@@ -43,5 +43,12 @@
 
   "postCreateCommand": "npm install",
 
-  "remoteUser": "node"
+  "workspaceFolder": "/workspaces/gyeongho-bookmark-telescope",
+  "remoteUser": "node",
+
+  "containerEnv": {
+    "WORKSPACE_PATH": "/workspaces/gyeongho-bookmark-telescope"
+  },
+
+  "postStartCommand": "echo 'cd /workspaces/gyeongho-bookmark-telescope' >> /home/node/.bashrc && echo 'cd /workspaces/gyeongho-bookmark-telescope' >> /home/node/.profile"
 }
