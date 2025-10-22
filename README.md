@@ -6,6 +6,21 @@ You can install it from [Chrome Web Store](https://chromewebstore.google.com/det
 
 A Chrome extension that provides nvim-telescope like interface for searching(live-grep) and previewing bookmarks. Press `Ctrl+Shift+L` (or `Cmd+Shift+L` on Mac) to open the leader palette, then press `g` to search bookmarks.
 
+## Prerequisites
+
+> ⚠️ **Chrome Version Requirement for Gemini LLM Model**:
+> This extension requires Chrome version 138 or later for the AI preview features. [Check your chrome version](chrome://version)
+>
+> ⚠️ **Chrome Flags Configuration**:
+> The preview pane uses Chrome's built-in Gemini LLM model for summarizing bookmarked pages. To enable this feature, you must enable the `chrome://flags/#summarization-api-for-gemini-nano` flag in Chrome. [Enable Summarization API for Gemini Nano](chrome://flags/#summarization-api-for-gemini-nano)
+>
+> ![Summarization API Setting](assets/summarizer_caution.png)
+>
+> ⚠️ **Shortcut Conflicts**:
+> The `Ctrl+Shift+L` shortcut(or `Cmd+Shift+L` on Mac) might already be assigned to other extensions that you are using. If the leader palette doesn't open when you press `Ctrl+Shift+L`, check for conflicts by visiting `chrome://extensions/shortcuts` in your Chrome browser. You may need to change the shortcut in your extension settings or disable conflicting extensions. [Check your shortcut conflicts](chrome://extensions/shortcuts)
+>
+> ![Shortcut Conflict Example](assets/shortcuts_caution.png)
+
 ## Features
 
 - **Quick Access**: Press `Ctrl+Shift+L` (or `Cmd+Shift+L` on Mac) to open the leader palette, then press `g` to search bookmarks
@@ -65,6 +80,11 @@ A Chrome extension that provides nvim-telescope like interface for searching(liv
 - `Enter`: Select
 - `q`: Close
 
+> ⚠️ **Important Note on Shortcut Conflicts**:
+> On Windows, the `Ctrl+Shift+L` shortcut might already be assigned to other extensions. If the leader palette doesn't open when you press `Ctrl+Shift+L`, check for conflicts by visiting `chrome://extensions/shortcuts` in your Chrome browser. You may need to change the shortcut in your extension settings or disable conflicting extensions.
+>
+> ![Shortcut Conflict Example](assets/shortcuts_caution.png)
+
 ## Privacy
 
 This extension:
@@ -73,6 +93,11 @@ This extension:
 - Fetches page content for previews (raw HTML only)
 - Does not store or transmit any personal data
 - Runs entirely locally in your browser
+
+> ⚠️ **Important Note on AI Preview Feature**:
+> The preview pane uses Chrome's built-in Gemini LLM model for summarizing bookmarked pages. To enable this feature, you must enable the `chrome://flags/#summarization-api-for-gemini-nano` flag in Chrome. This requires Chrome version 125 or later.
+>
+> ![Summarization API Setting](assets/summarizer_caution.png)
 
 [Privacy Policy](PRIVACY_POLICY.md)
 
