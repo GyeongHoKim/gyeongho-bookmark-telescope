@@ -26,3 +26,13 @@ web-ext.config.ts
 
 # Agents
 .claude
+.qwen
+.gemini
+.copilot
+.cursor
+.windsurf
+.kilocode
+.auggie
+.roo
+.codebuddy
+.q
