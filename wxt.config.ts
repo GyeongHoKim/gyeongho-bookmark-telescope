@@ -4,32 +4,33 @@ import { defineConfig } from 'wxt';
 export default defineConfig({
   modules: ['@wxt-dev/module-react'],
   zip: {
-    artifactTemplate: 'lazy-bookmark-{{browser}}.zip'
+    artifactTemplate: 'lazy-bookmark-{{browser}}.zip',
   },
   manifest: {
     name: 'LazyBookmark',
-    description: 'Live grep through bookmarks with LazySth like interface using leader key',
-    version: '3.0.0',
+    description:
+      'Live grep through bookmarks with LazySth like interface using leader key',
+    version: '2.1.0',
     permissions: ['bookmarks', 'tabs', 'activeTab', 'scripting'],
     commands: {
       'open-leader-palette': {
         suggested_key: {
           default: 'Ctrl+Shift+L',
-          mac: 'Command+Shift+L'
+          mac: 'Command+Shift+L',
         },
-        description: 'Open leader palette'
-      }
+        description: 'Open leader palette',
+      },
     },
     content_scripts: [
       {
         matches: ['<all_urls>'],
         js: ['content-scripts/content.js'],
-        css: ['content-scripts/content.css']
-      }
+        css: ['content-scripts/content.css'],
+      },
     ],
     action: {
       default_popup: 'popup.html',
-      default_title: 'Bookmark Telescope Settings'
-    }
-  }
+      default_title: 'Bookmark Telescope Settings',
+    },
+  },
 });
