@@ -7,11 +7,7 @@
       "extensions": [
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
-        "ms-vscode.vscode-typescript-next",
-        "bradlc.vscode-tailwindcss",
-        "vitest.explorer",
-        "ZixuanChen.vitest-explorer",
-        "ms-playwright.playwright"
+        "ms-vscode.vscode-typescript-next"
       ],
       "settings": {
         "editor.formatOnSave": true,
@@ -42,7 +38,7 @@
 
   "forwardPorts": [9229],
 
-  "postCreateCommand": "npm install && npx playwright install-deps && npx playwright install",
+  "postCreateCommand": "npm install",
 
   "remoteUser": "node"
 }
