@@ -2,6 +2,7 @@ import { isProbablyReaderable, Readability } from '@mozilla/readability';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { debounce } from '../../../common/utils/debounce';
 import { extractDocumentMetadata } from '../models/DocumentMetadataExtractor';
+import { summarizeWithChunking } from '../models/ChunkedSummarizer';
 
 /**
  * Extract clean text from HTML using Mozilla's Readability.js
@@ -302,11 +303,12 @@ export const useSummarizer = (
 
         const textOnly = extractCleanTextWithReadability(text);
 
-        const result = await summarizerInstance.summarize(textOnly, {
+        const result = await summarizeWithChunking(textOnly, {
+          summarizer: summarizerInstance,
           context: 'Article from bookmark',
         });
 
-        setSummary(result);
+        setSummary(result.summary);
         setStatus('available');
       } catch (err) {
         console.error('Error generating AI summary:', err);
